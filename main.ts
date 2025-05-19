@@ -6,11 +6,12 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.ts'),
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
+
   win.loadFile('dist/public/index.html');
 
   // 开发环境打开开发者工具
