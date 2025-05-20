@@ -1,61 +1,65 @@
-import { Live2DFramework } from '../Live2DFramework.js';
+import { Live2DFramework } from '../Live2DFramework';
+
+interface ModelJson {
+  [key: string]: any;
+}
 
 class ModelSettingJson {
-  constructor() {
-    this.NAME = 'name';
-    this.ID = 'id';
-    this.MODEL = 'model';
-    this.TEXTURES = 'textures';
-    this.HIT_AREAS = 'hit_areas';
-    this.PHYSICS = 'physics';
-    this.POSE = 'pose';
-    this.EXPRESSIONS = 'expressions';
-    this.MOTION_GROUPS = 'motions';
-    this.SOUND = 'sound';
-    this.FADE_IN = 'fade_in';
-    this.FADE_OUT = 'fade_out';
-    this.LAYOUT = 'layout';
-    this.INIT_PARAM = 'init_param';
-    this.INIT_PARTS_VISIBLE = 'init_parts_visible';
-    this.VALUE = 'val';
-    this.FILE = 'file';
+  private readonly NAME: string = 'name';
+  private readonly ID: string = 'id';
+  private readonly MODEL: string = 'model';
+  private readonly TEXTURES: string = 'textures';
+  private readonly HIT_AREAS: string = 'hit_areas';
+  private readonly PHYSICS: string = 'physics';
+  private readonly POSE: string = 'pose';
+  private readonly EXPRESSIONS: string = 'expressions';
+  private readonly MOTION_GROUPS: string = 'motions';
+  private readonly SOUND: string = 'sound';
+  private readonly FADE_IN: string = 'fade_in';
+  private readonly FADE_OUT: string = 'fade_out';
+  private readonly LAYOUT: string = 'layout';
+  private readonly INIT_PARAM: string = 'init_param';
+  private readonly INIT_PARTS_VISIBLE: string = 'init_parts_visible';
+  private readonly VALUE: string = 'val';
+  private readonly FILE: string = 'file';
 
-    this.json = {};
-  }
+  public json: ModelJson = {};
 
-  loadModelSetting(path, callback) {
+  loadModelSetting(path: string, callback: () => void): void {
     const pm = Live2DFramework.getPlatformManager();
-    pm.loadBytes(path, buf => {
-      const str = String.fromCharCode.apply(null, new Uint8Array(buf));
+    if (!pm) return;
+
+    pm.loadBytes(path, (buf: ArrayBuffer) => {
+      const str = String.fromCharCode.apply(null, new Uint8Array(buf) as any);
       this.json = JSON.parse(str);
       callback();
     });
   }
 
-  getTextureFile(n) {
+  getTextureFile(n: number): string | null {
     if (this.json[this.TEXTURES] == null || this.json[this.TEXTURES][n] == null)
       return null;
 
     return this.json[this.TEXTURES][n];
   }
 
-  getModelFile() {
+  getModelFile(): string {
     return this.json[this.MODEL];
   }
 
-  getTextureNum() {
+  getTextureNum(): number {
     if (this.json[this.TEXTURES] == null) return 0;
 
     return this.json[this.TEXTURES].length;
   }
 
-  getHitAreaNum() {
+  getHitAreaNum(): number {
     if (this.json[this.HIT_AREAS] == null) return 0;
 
     return this.json[this.HIT_AREAS].length;
   }
 
-  getHitAreaID(n) {
+  getHitAreaID(n: number): string | null {
     if (
       this.json[this.HIT_AREAS] == null ||
       this.json[this.HIT_AREAS][n] == null
@@ -65,7 +69,7 @@ class ModelSettingJson {
     return this.json[this.HIT_AREAS][n][this.ID];
   }
 
-  getHitAreaName(n) {
+  getHitAreaName(n: number): string | null {
     if (
       this.json[this.HIT_AREAS] == null ||
       this.json[this.HIT_AREAS][n] == null
@@ -75,41 +79,41 @@ class ModelSettingJson {
     return this.json[this.HIT_AREAS][n][this.NAME];
   }
 
-  getPhysicsFile() {
+  getPhysicsFile(): string | null {
     return this.json[this.PHYSICS];
   }
 
-  getPoseFile() {
+  getPoseFile(): string | null {
     return this.json[this.POSE];
   }
 
-  getExpressionNum() {
+  getExpressionNum(): number {
     return this.json[this.EXPRESSIONS] == null
       ? 0
       : this.json[this.EXPRESSIONS].length;
   }
 
-  getExpressionFile(n) {
+  getExpressionFile(n: number): string | null {
     if (this.json[this.EXPRESSIONS] == null) return null;
     return this.json[this.EXPRESSIONS][n][this.FILE];
   }
 
-  getExpressionName(n) {
+  getExpressionName(n: number): string | null {
     if (this.json[this.EXPRESSIONS] == null) return null;
     return this.json[this.EXPRESSIONS][n][this.NAME];
   }
 
-  getLayout() {
+  getLayout(): any {
     return this.json[this.LAYOUT];
   }
 
-  getInitParamNum() {
+  getInitParamNum(): number {
     return this.json[this.INIT_PARAM] == null
       ? 0
       : this.json[this.INIT_PARAM].length;
   }
 
-  getMotionNum(name) {
+  getMotionNum(name: string): number {
     if (
       this.json[this.MOTION_GROUPS] == null ||
       this.json[this.MOTION_GROUPS][name] == null
@@ -119,7 +123,7 @@ class ModelSettingJson {
     return this.json[this.MOTION_GROUPS][name].length;
   }
 
-  getMotionFile(name, n) {
+  getMotionFile(name: string, n: number): string | null {
     if (
       this.json[this.MOTION_GROUPS] == null ||
       this.json[this.MOTION_GROUPS][name] == null ||
@@ -130,7 +134,7 @@ class ModelSettingJson {
     return this.json[this.MOTION_GROUPS][name][n][this.FILE];
   }
 
-  getMotionSound(name, n) {
+  getMotionSound(name: string, n: number): string | null {
     if (
       this.json[this.MOTION_GROUPS] == null ||
       this.json[this.MOTION_GROUPS][name] == null ||
@@ -142,7 +146,7 @@ class ModelSettingJson {
     return this.json[this.MOTION_GROUPS][name][n][this.SOUND];
   }
 
-  getMotionFadeIn(name, n) {
+  getMotionFadeIn(name: string, n: number): number {
     if (
       this.json[this.MOTION_GROUPS] == null ||
       this.json[this.MOTION_GROUPS][name] == null ||
@@ -154,7 +158,7 @@ class ModelSettingJson {
     return this.json[this.MOTION_GROUPS][name][n][this.FADE_IN];
   }
 
-  getMotionFadeOut(name, n) {
+  getMotionFadeOut(name: string, n: number): number {
     if (
       this.json[this.MOTION_GROUPS] == null ||
       this.json[this.MOTION_GROUPS][name] == null ||
@@ -166,7 +170,7 @@ class ModelSettingJson {
     return this.json[this.MOTION_GROUPS][name][n][this.FADE_OUT];
   }
 
-  getInitParamID(n) {
+  getInitParamID(n: number): string | null {
     if (
       this.json[this.INIT_PARAM] == null ||
       this.json[this.INIT_PARAM][n] == null
@@ -176,7 +180,7 @@ class ModelSettingJson {
     return this.json[this.INIT_PARAM][n][this.ID];
   }
 
-  getInitParamValue(n) {
+  getInitParamValue(n: number): number {
     if (
       this.json[this.INIT_PARAM] == null ||
       this.json[this.INIT_PARAM][n] == null
@@ -186,13 +190,13 @@ class ModelSettingJson {
     return this.json[this.INIT_PARAM][n][this.VALUE];
   }
 
-  getInitPartsVisibleNum() {
+  getInitPartsVisibleNum(): number {
     return this.json[this.INIT_PARTS_VISIBLE] == null
       ? 0
       : this.json[this.INIT_PARTS_VISIBLE].length;
   }
 
-  getInitPartsVisibleID(n) {
+  getInitPartsVisibleID(n: number): string | null {
     if (
       this.json[this.INIT_PARTS_VISIBLE] == null ||
       this.json[this.INIT_PARTS_VISIBLE][n] == null
@@ -201,7 +205,7 @@ class ModelSettingJson {
     return this.json[this.INIT_PARTS_VISIBLE][n][this.ID];
   }
 
-  getInitPartsVisibleValue(n) {
+  getInitPartsVisibleValue(n: number): number {
     if (
       this.json[this.INIT_PARTS_VISIBLE] == null ||
       this.json[this.INIT_PARTS_VISIBLE][n] == null
@@ -212,4 +216,4 @@ class ModelSettingJson {
   }
 }
 
-export default ModelSettingJson;
+export default ModelSettingJson; 

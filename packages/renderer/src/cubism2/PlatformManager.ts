@@ -7,20 +7,30 @@
  *  (c) Live2D Inc. All rights reserved.
  */
 
-import logger from '../logger.js';
+import logger from '../logger';
+
+// 声明需要的Live2D类型
+declare const Live2DModelWebGL: {
+  loadModel(buffer: ArrayBuffer): Live2DModel;
+};
+
+interface Live2DModel {
+  isPremultipliedAlpha(): boolean;
+  setTexture(textureNo: number, texture: WebGLTexture): void;
+}
+
 //============================================================
 //============================================================
 //  class PlatformManager     extend IPlatformManager
 //============================================================
 //============================================================
 class PlatformManager {
-  constructor() {
-    this.cache = {};
-  }
+  private cache: { [key: string]: ArrayBuffer } = {};
+
   //============================================================
   //    PlatformManager # loadBytes()
   //============================================================
-  loadBytes(path /*String*/, callback) {
+  loadBytes(path: string, callback: (buffer: ArrayBuffer) => void): void {
     if (path in this.cache) {
       return callback(this.cache[path]);
     }
@@ -35,8 +45,8 @@ class PlatformManager {
   //============================================================
   //    PlatformManager # loadLive2DModel()
   //============================================================
-  loadLive2DModel(path /*String*/, callback) {
-    let model = null;
+  loadLive2DModel(path: string, callback: (model: Live2DModel) => void): void {
+    let model: Live2DModel | null = null;
 
     // load moc
     this.loadBytes(path, buf => {
@@ -48,7 +58,12 @@ class PlatformManager {
   //============================================================
   //    PlatformManager # loadTexture()
   //============================================================
-  loadTexture(model /*ALive2DModel*/, no /*int*/, path /*String*/, callback) {
+  loadTexture(
+    model: Live2DModel,
+    no: number,
+    path: string,
+    callback?: () => void
+  ): void {
     // load textures
     const loadedImage = new Image();
     loadedImage.crossOrigin = 'anonymous';
@@ -56,16 +71,16 @@ class PlatformManager {
 
     loadedImage.onload = () => {
       // create texture
-      const canvas = document.getElementById('live2d');
-      const gl = canvas.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: true });
+      const canvas = document.getElementById('live2d') as HTMLCanvasElement;
+      const gl = canvas.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: true }) as WebGLRenderingContext;
       let texture = gl.createTexture();
       if (!texture) {
         logger.error('Failed to generate gl texture name.');
-        return -1;
+        return;
       }
 
       if (model.isPremultipliedAlpha() == false) {
-        // 乗算済アルファテクスチャ以外の場合
+        // 非乘算済アルファテクスチャ以外の场合
         gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
       }
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
@@ -89,9 +104,6 @@ class PlatformManager {
 
       model.setTexture(no, texture);
 
-      // テクスチャオブジェクトを解放
-      texture = null;
-
       if (typeof callback == 'function') callback();
     };
 
@@ -104,14 +116,14 @@ class PlatformManager {
   //    PlatformManager # parseFromBytes(buf)
 
   //============================================================
-  jsonParseFromBytes(buf) {
-    let jsonStr;
+  jsonParseFromBytes(buf: ArrayBuffer): any {
+    let jsonStr: string;
 
     const bomCode = new Uint8Array(buf, 0, 3);
     if (bomCode[0] == 239 && bomCode[1] == 187 && bomCode[2] == 191) {
-      jsonStr = String.fromCharCode.apply(null, new Uint8Array(buf, 3));
+      jsonStr = String.fromCharCode.apply(null, new Uint8Array(buf, 3) as any);
     } else {
-      jsonStr = String.fromCharCode.apply(null, new Uint8Array(buf));
+      jsonStr = String.fromCharCode.apply(null, new Uint8Array(buf) as any);
     }
 
     const jsonObj = JSON.parse(jsonStr);
@@ -120,4 +132,4 @@ class PlatformManager {
   }
 }
 
-export default PlatformManager;
+export default PlatformManager; 

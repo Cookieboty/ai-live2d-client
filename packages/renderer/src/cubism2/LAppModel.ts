@@ -1,9 +1,14 @@
 /* global UtSystem, document */
-import { L2DBaseModel, Live2DFramework, L2DEyeBlink } from './Live2DFramework.js';
-import ModelSettingJson from './utils/ModelSettingJson.js';
-import LAppDefine from './LAppDefine.js';
-import MatrixStack from './utils/MatrixStack.js';
-import logger from '../logger.js';
+import { L2DBaseModel, Live2DFramework, L2DEyeBlink } from './Live2DFramework';
+import ModelSettingJson from './utils/ModelSettingJson';
+import LAppDefine from './LAppDefine';
+import MatrixStack from './utils/MatrixStack';
+import logger from '../logger';
+
+// 声明全局变量
+declare const UtSystem: {
+  getUserTimeMSec(): number;
+};
 
 //============================================================
 //============================================================
@@ -11,42 +16,45 @@ import logger from '../logger.js';
 //============================================================
 //============================================================
 class LAppModel extends L2DBaseModel {
-  constructor() {
-    //L2DBaseModel.apply(this, arguments);
-    super();
+  modelHomeDir: string = '';
+  modelSetting: ModelSettingJson | null = null;
+  tmpMatrix: number[] = [];
 
-    this.modelHomeDir = '';
-    this.modelSetting = null;
-    this.tmpMatrix = [];
+  constructor() {
+    super();
   }
 
-  loadJSON(callback) {
+  loadJSON(callback: () => void): void {
+    if (!this.modelSetting) return;
+
     const path = this.modelHomeDir + this.modelSetting.getModelFile();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    this.loadModelData(path, model => {
-      for (let i = 0; i < this.modelSetting.getTextureNum(); i++) {
+
+    this.loadModelData(path, () => {
+      for (let i = 0; i < this.modelSetting!.getTextureNum(); i++) {
         const texPaths =
-          this.modelHomeDir + this.modelSetting.getTextureFile(i);
+          this.modelHomeDir + this.modelSetting!.getTextureFile(i);
 
         this.loadTexture(i, texPaths, () => {
           if (this.isTexLoaded) {
-            if (this.modelSetting.getExpressionNum() > 0) {
+            if (this.modelSetting!.getExpressionNum() > 0) {
               this.expressions = {};
 
               for (
                 let j = 0;
-                j < this.modelSetting.getExpressionNum();
+                j < this.modelSetting!.getExpressionNum();
                 j++
               ) {
-                const expName = this.modelSetting.getExpressionName(j);
+                const expName = this.modelSetting!.getExpressionName(j);
+                if (!expName) continue;
+
                 const expFilePath =
                   this.modelHomeDir +
-                  this.modelSetting.getExpressionFile(j);
+                  this.modelSetting!.getExpressionFile(j);
 
                 this.loadExpression(expName, expFilePath);
               }
             } else {
-              this.expressionManager = null;
+              this.expressionManager = new (Live2DFramework as any).L2DMotionManager();
               this.expressions = {};
             }
 
@@ -54,68 +62,71 @@ class LAppModel extends L2DBaseModel {
               this.eyeBlink = new L2DEyeBlink();
             }
 
-            if (this.modelSetting.getPhysicsFile() != null) {
+            if (this.modelSetting!.getPhysicsFile() != null) {
               this.loadPhysics(
-                this.modelHomeDir + this.modelSetting.getPhysicsFile(),
+                this.modelHomeDir + this.modelSetting!.getPhysicsFile()!,
               );
             } else {
               this.physics = null;
             }
 
-            if (this.modelSetting.getPoseFile() != null) {
+            if (this.modelSetting!.getPoseFile() != null) {
               this.loadPose(
-                this.modelHomeDir + this.modelSetting.getPoseFile(),
+                this.modelHomeDir + this.modelSetting!.getPoseFile()!,
                 () => {
-                  this.pose.updateParam(this.live2DModel);
+                  if (this.pose) {
+                    this.pose.updateParam(this.live2DModel);
+                  }
                 },
               );
             } else {
               this.pose = null;
             }
 
-            if (this.modelSetting.getLayout() != null) {
-              const layout = this.modelSetting.getLayout();
-              if (layout['width'] != null)
+            if (this.modelSetting!.getLayout() != null) {
+              const layout = this.modelSetting!.getLayout();
+              if (layout['width'] != null && this.modelMatrix)
                 this.modelMatrix.setWidth(layout['width']);
-              if (layout['height'] != null)
+              if (layout['height'] != null && this.modelMatrix)
                 this.modelMatrix.setHeight(layout['height']);
 
-              if (layout['x'] != null) this.modelMatrix.setX(layout['x']);
-              if (layout['y'] != null) this.modelMatrix.setY(layout['y']);
-              if (layout['center_x'] != null)
+              if (layout['x'] != null && this.modelMatrix) this.modelMatrix.setX(layout['x']);
+              if (layout['y'] != null && this.modelMatrix) this.modelMatrix.setY(layout['y']);
+              if (layout['center_x'] != null && this.modelMatrix)
                 this.modelMatrix.centerX(layout['center_x']);
-              if (layout['center_y'] != null)
+              if (layout['center_y'] != null && this.modelMatrix)
                 this.modelMatrix.centerY(layout['center_y']);
-              if (layout['top'] != null)
+              if (layout['top'] != null && this.modelMatrix)
                 this.modelMatrix.top(layout['top']);
-              if (layout['bottom'] != null)
+              if (layout['bottom'] != null && this.modelMatrix)
                 this.modelMatrix.bottom(layout['bottom']);
-              if (layout['left'] != null)
+              if (layout['left'] != null && this.modelMatrix)
                 this.modelMatrix.left(layout['left']);
-              if (layout['right'] != null)
+              if (layout['right'] != null && this.modelMatrix)
                 this.modelMatrix.right(layout['right']);
             }
 
-            for (let j = 0; j < this.modelSetting.getInitParamNum(); j++) {
-              this.live2DModel.setParamFloat(
-                this.modelSetting.getInitParamID(j),
-                this.modelSetting.getInitParamValue(j),
-              );
+            for (let j = 0; j < this.modelSetting!.getInitParamNum(); j++) {
+              const paramId = this.modelSetting!.getInitParamID(j);
+              if (paramId) {
+                const value = this.modelSetting!.getInitParamValue(j);
+                this.live2DModel.setParamFloat(paramId, value);
+              }
             }
 
             for (
               let j = 0;
-              j < this.modelSetting.getInitPartsVisibleNum();
+              j < this.modelSetting!.getInitPartsVisibleNum();
               j++
             ) {
-              this.live2DModel.setPartsOpacity(
-                this.modelSetting.getInitPartsVisibleID(j),
-                this.modelSetting.getInitPartsVisibleValue(j),
-              );
+              const visibleId = this.modelSetting!.getInitPartsVisibleID(j);
+              if (visibleId) {
+                const value = this.modelSetting!.getInitPartsVisibleValue(j);
+                this.live2DModel.setPartsOpacity(visibleId, value);
+              }
             }
 
             this.live2DModel.saveParam();
-            // this.live2DModel.setGL(gl);
 
             this.preloadMotionGroup(LAppDefine.MOTION_GROUP_IDLE);
             this.mainMotionManager.stopAllMotions();
@@ -123,14 +134,14 @@ class LAppModel extends L2DBaseModel {
             this.setUpdating(false);
             this.setInitialized(true);
 
-            if (typeof callback == 'function') callback();
+            if (typeof callback === 'function') callback();
           }
         });
       }
     });
   }
 
-  async loadModelSetting(modelSettingPath, modelSetting) {
+  async loadModelSetting(modelSettingPath: string, modelSetting: any): Promise<void> {
     this.setUpdating(true);
     this.setInitialized(false);
 
@@ -141,10 +152,10 @@ class LAppModel extends L2DBaseModel {
 
     this.modelSetting = new ModelSettingJson();
     this.modelSetting.json = modelSetting;
-    await new Promise(resolve => this.loadJSON(resolve));
+    await new Promise<void>(resolve => this.loadJSON(resolve));
   }
 
-  load(gl, modelSettingPath, callback) {
+  load(gl: WebGLRenderingContext, modelSettingPath: string, callback: () => void): void {
     this.setUpdating(true);
     this.setInitialized(false);
 
@@ -160,33 +171,39 @@ class LAppModel extends L2DBaseModel {
     });
   }
 
-  release(gl) {
-    // this.live2DModel.deleteTextures();
+  release(gl: WebGLRenderingContext): void {
+    // 获取平台管理器
     const pm = Live2DFramework.getPlatformManager();
 
-    gl.deleteTexture(pm.texture);
+    // 删除纹理
+    if (pm && gl && (pm as any).texture) {
+      gl.deleteTexture((pm as any).texture);
+    }
   }
 
-  preloadMotionGroup(name) {
+  preloadMotionGroup(name: string): void {
+    if (!this.modelSetting) return;
+
     for (let i = 0; i < this.modelSetting.getMotionNum(name); i++) {
       const file = this.modelSetting.getMotionFile(name, i);
+      if (!file) continue;
+
       this.loadMotion(file, this.modelHomeDir + file, motion => {
-        motion.setFadeIn(this.modelSetting.getMotionFadeIn(name, i));
-        motion.setFadeOut(this.modelSetting.getMotionFadeOut(name, i));
+        if (!motion) return;
+
+        motion.setFadeIn(this.modelSetting!.getMotionFadeIn(name, i));
+        motion.setFadeOut(this.modelSetting!.getMotionFadeOut(name, i));
       });
     }
   }
 
-  update() {
-    // logger.trace("--> LAppModel.update()");
-
+  update(): void {
     if (this.live2DModel == null) {
       logger.error('Failed to update.');
-
       return;
     }
 
-    const timeMSec = UtSystem.getUserTimeMSec() - this.startTimeMSec;
+    const timeMSec = UtSystem.getUserTimeMSec() - (this.startTimeMSec || 0);
     const timeSec = timeMSec / 1000.0;
     const t = timeSec * 2 * Math.PI;
 
@@ -274,25 +291,27 @@ class LAppModel extends L2DBaseModel {
     this.live2DModel.update();
   }
 
-  setRandomExpression() {
-    const tmp = [];
+  setRandomExpression(): void {
+    const tmp: string[] = [];
     for (const name in this.expressions) {
       tmp.push(name);
     }
 
-    const no = parseInt(Math.random() * tmp.length);
+    const no = parseInt(String(Math.random() * tmp.length));
 
     this.setExpression(tmp[no]);
   }
 
-  startRandomMotion(name, priority) {
+  startRandomMotion(name: string, priority: number): void {
+    if (!this.modelSetting) return;
+
     const max = this.modelSetting.getMotionNum(name);
-    const no = parseInt(Math.random() * max);
+    const no = parseInt(String(Math.random() * max));
     this.startMotion(name, no, priority);
   }
 
-  startMotion(name, no, priority) {
-    // logger.trace("startMotion : " + name + " " + no + " " + priority);
+  startMotion(name: string, no: number, priority: number): void {
+    if (!this.modelSetting) return;
 
     const motionName = this.modelSetting.getMotionFile(name, no);
 
@@ -308,7 +327,7 @@ class LAppModel extends L2DBaseModel {
       return;
     }
 
-    let motion;
+    let motion: any;
 
     if (this.motions[name] == null) {
       this.loadMotion(null, this.modelHomeDir + motionName, mtn => {
@@ -323,8 +342,11 @@ class LAppModel extends L2DBaseModel {
     }
   }
 
-  setFadeInFadeOut(name, no, priority, motion) {
+  setFadeInFadeOut(name: string, no: number, priority: number, motion: any): void {
+    if (!this.modelSetting) return;
+
     const motionName = this.modelSetting.getMotionFile(name, no);
+    if (!motionName) return;
 
     motion.setFadeIn(this.modelSetting.getMotionFadeIn(name, no));
     motion.setFadeOut(this.modelSetting.getMotionFadeOut(name, no));
@@ -347,7 +369,7 @@ class LAppModel extends L2DBaseModel {
     }
   }
 
-  setExpression(name) {
+  setExpression(name: string): void {
     const motion = this.expressions[name];
 
     logger.trace('Expression : ' + name);
@@ -355,15 +377,12 @@ class LAppModel extends L2DBaseModel {
     this.expressionManager.startMotion(motion, false);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  draw(gl) {
-    //logger.trace("--> LAppModel.draw()");
-
-    // if(this.live2DModel == null) return;
-
+  draw(gl: WebGLRenderingContext): void {
     MatrixStack.push();
 
-    MatrixStack.multMatrix(this.modelMatrix.getArray());
+    if (this.modelMatrix) {
+      MatrixStack.multMatrix(this.modelMatrix.getArray());
+    }
 
     this.tmpMatrix = MatrixStack.getMatrix();
     this.live2DModel.setMatrix(this.tmpMatrix);
@@ -372,11 +391,14 @@ class LAppModel extends L2DBaseModel {
     MatrixStack.pop();
   }
 
-  hitTest(id, testX, testY) {
+  hitTest(id: string, testX: number, testY: number): boolean {
+    if (!this.modelSetting) return false;
+
     const len = this.modelSetting.getHitAreaNum();
     for (let i = 0; i < len; i++) {
       if (id == this.modelSetting.getHitAreaName(i)) {
         const drawID = this.modelSetting.getHitAreaID(i);
+        if (!drawID) continue;
 
         return this.hitTestSimple(drawID, testX, testY);
       }
@@ -386,4 +408,4 @@ class LAppModel extends L2DBaseModel {
   }
 }
 
-export default LAppModel;
+export default LAppModel; 

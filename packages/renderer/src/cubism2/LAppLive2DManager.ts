@@ -1,33 +1,43 @@
 /* global Live2D */
-import { Live2DFramework } from './Live2DFramework.js';
-import LAppModel from './LAppModel.js';
-import PlatformManager from './PlatformManager.js';
-import LAppDefine from './LAppDefine.js';
-import logger from '../logger.js';
+import { Live2DFramework } from './Live2DFramework';
+import LAppModel from './LAppModel';
+import PlatformManager from './PlatformManager';
+import LAppDefine from './LAppDefine';
+import logger from '../logger';
+
+// 声明Live2D全局对象
+declare const Live2D: {
+  init(): void;
+};
 
 class LAppLive2DManager {
-  constructor() {
-    this.model = null;
-    this.reloading = false;
+  private model: LAppModel | null = null;
+  private reloading: boolean = false;
 
+  constructor() {
     Live2D.init();
     Live2DFramework.setPlatformManager(new PlatformManager());
   }
 
-  getModel() {
+  getModel(): LAppModel | null {
     return this.model;
   }
 
-  releaseModel(gl) {
+  releaseModel(gl: WebGLRenderingContext): void {
     if (this.model) {
       this.model.release(gl);
       this.model = null;
     }
   }
 
-  async changeModel(gl, modelSettingPath) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return new Promise((resolve, reject) => {
+  release(gl?: WebGLRenderingContext): void {
+    if (gl) {
+      this.releaseModel(gl);
+    }
+  }
+
+  async changeModel(gl: WebGLRenderingContext, modelSettingPath: string): Promise<void> {
+    return new Promise((resolve) => {
       if (this.reloading) return;
       this.reloading = true;
 
@@ -45,7 +55,7 @@ class LAppLive2DManager {
     });
   }
 
-  async changeModelWithJSON(gl, modelSettingPath, modelSetting) {
+  async changeModelWithJSON(gl: WebGLRenderingContext, modelSettingPath: string, modelSetting: any): Promise<void> {
     if (this.reloading) return;
     this.reloading = true;
 
@@ -60,13 +70,13 @@ class LAppLive2DManager {
     this.reloading = false;
   }
 
-  setDrag(x, y) {
+  setDrag(x: number, y: number): void {
     if (this.model) {
       this.model.setDrag(x, y);
     }
   }
 
-  maxScaleEvent() {
+  maxScaleEvent(): void {
     logger.trace('Max scale event.');
     if (this.model) {
       this.model.startRandomMotion(
@@ -76,7 +86,7 @@ class LAppLive2DManager {
     }
   }
 
-  minScaleEvent() {
+  minScaleEvent(): void {
     logger.trace('Min scale event.');
     if (this.model) {
       this.model.startRandomMotion(
@@ -86,7 +96,7 @@ class LAppLive2DManager {
     }
   }
 
-  tapEvent(x, y) {
+  tapEvent(x: number, y: number): boolean {
     logger.trace('tapEvent view x:' + x + ' y:' + y);
 
     if (!this.model) return false;
@@ -105,4 +115,4 @@ class LAppLive2DManager {
   }
 }
 
-export default LAppLive2DManager;
+export default LAppLive2DManager; 

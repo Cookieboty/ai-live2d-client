@@ -3,6 +3,6 @@
  * @module waifu-tips
  */
 
-import { initWidget } from './widget.js';
+import { initWidget } from './widget';
 
 window.initWidget = initWidget;

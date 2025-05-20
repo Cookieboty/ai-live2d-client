@@ -7,18 +7,22 @@
  */
 
 class MatrixStack {
-  static reset() {
+  static matrixStack: number[] = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+  static depth: number = 0;
+  static currentMatrix: number[] = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+  static tmp: number[] = new Array(16);
+
+  static reset(): void {
     this.depth = 0;
   }
 
-  static loadIdentity() {
+  static loadIdentity(): void {
     for (let i = 0; i < 16; i++) {
       this.currentMatrix[i] = i % 5 == 0 ? 1 : 0;
     }
   }
 
-  static push() {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  static push(): void {
     const offset = this.depth * 16;
     const nextOffset = (this.depth + 1) * 16;
 
@@ -33,7 +37,7 @@ class MatrixStack {
     this.depth++;
   }
 
-  static pop() {
+  static pop(): void {
     this.depth--;
     if (this.depth < 0) {
       this.depth = 0;
@@ -45,11 +49,11 @@ class MatrixStack {
     }
   }
 
-  static getMatrix() {
+  static getMatrix(): number[] {
     return this.currentMatrix;
   }
 
-  static multMatrix(matNew) {
+  static multMatrix(matNew: number[]): void {
     let i, j, k;
 
     for (i = 0; i < 16; i++) {
@@ -70,12 +74,4 @@ class MatrixStack {
   }
 }
 
-MatrixStack.matrixStack = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-
-MatrixStack.depth = 0;
-
-MatrixStack.currentMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-
-MatrixStack.tmp = new Array(16);
-
-export default MatrixStack;
+export default MatrixStack; 
