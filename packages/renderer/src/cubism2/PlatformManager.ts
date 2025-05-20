@@ -7,7 +7,7 @@
  *  (c) Live2D Inc. All rights reserved.
  */
 
-import logger from '../logger';
+import logger from '@/utils/logger';
 
 // 声明需要的Live2D类型
 declare const Live2DModelWebGL: {

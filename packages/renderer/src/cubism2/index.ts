@@ -3,7 +3,7 @@ import { L2DMatrix44, L2DTargetPoint, L2DViewMatrix } from './Live2DFramework';
 import LAppDefine from './LAppDefine';
 import MatrixStack from './utils/MatrixStack';
 import LAppLive2DManager from './LAppLive2DManager';
-import logger from '../logger';
+import logger from '@/utils/logger';
 
 class Cubism2Model {
   private live2DMgr: LAppLive2DManager;

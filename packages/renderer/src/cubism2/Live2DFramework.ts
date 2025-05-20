@@ -6,7 +6,7 @@
  *
  *  (c) Live2D Inc. All rights reserved.
  */
-import logger from '../logger';
+import logger from '@/utils/logger';
 
 // 声明全局变量类型
 declare const Live2D: any;

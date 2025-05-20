@@ -1,9 +1,9 @@
 /* global UtSystem, document */
-import { L2DBaseModel, Live2DFramework, L2DEyeBlink } from './Live2DFramework';
+import { L2DBaseModel, Live2DFramework, L2DEyeBlink, L2DMotionManager } from './Live2DFramework';
 import ModelSettingJson from './utils/ModelSettingJson';
 import LAppDefine from './LAppDefine';
 import MatrixStack from './utils/MatrixStack';
-import logger from '../logger';
+import logger from '@/utils/logger';
 
 // 声明全局变量
 declare const UtSystem: {
@@ -54,7 +54,7 @@ class LAppModel extends L2DBaseModel {
                 this.loadExpression(expName, expFilePath);
               }
             } else {
-              this.expressionManager = new (Live2DFramework as any).L2DMotionManager();
+              this.expressionManager = new L2DMotionManager();
               this.expressions = {};
             }
 

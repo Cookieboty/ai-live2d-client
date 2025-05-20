@@ -3,7 +3,7 @@ import { Live2DFramework } from './Live2DFramework';
 import LAppModel from './LAppModel';
 import PlatformManager from './PlatformManager';
 import LAppDefine from './LAppDefine';
-import logger from '../logger';
+import logger from '@/utils/logger';
 
 // 声明Live2D全局对象
 declare const Live2D: {
