@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "declaration": true,
+    "outDir": "build",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "removeComments": true,
+    "allowJs": true,
+    "paths": {
+      "@framework/*": [
+        "./src/CubismSdkForWeb-5-r.4/Framework/src/*"
+      ],
+      "@demo/*": [
+        "./src/CubismSdkForWeb-5-r.4/Samples/TypeScript/Demo/src/*"
+      ]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "build", "dist"]
+}
