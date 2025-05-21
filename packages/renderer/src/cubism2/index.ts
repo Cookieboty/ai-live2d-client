@@ -125,7 +125,11 @@ class Cubism2Model {
 
     // 3. Release Live2D related resources
     if (this.live2DMgr && typeof this.live2DMgr.release === 'function') {
-      this.live2DMgr.release(this.gl);
+      if (this.gl) {
+        this.live2DMgr.release(this.gl);
+      } else {
+        this.live2DMgr.release();
+      }
     }
 
     // 4. Clear references to assist GC
@@ -160,8 +164,15 @@ class Cubism2Model {
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    MatrixStack.multMatrix(this.projMatrix!.getArray());
-    MatrixStack.multMatrix(this.viewMatrix!.getArray());
+    // 转换Float32Array为number[]类型
+    if (this.projMatrix && this.viewMatrix) {
+      const projArray = this.projMatrix.getArray();
+      const viewArray = this.viewMatrix.getArray();
+
+      MatrixStack.multMatrix(projArray);
+      MatrixStack.multMatrix(viewArray);
+    }
+
     MatrixStack.push();
 
     const model = this.live2DMgr.getModel();

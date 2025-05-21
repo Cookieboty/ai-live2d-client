@@ -259,7 +259,7 @@ export class L2DBaseModel {
         if (typeof callback == 'function') callback();
       });
     } catch (e) {
-      logger.warn(e);
+      logger.warn(String(e));
     }
   }
 
@@ -274,7 +274,7 @@ export class L2DBaseModel {
         this.physics = L2DPhysics.load(buf);
       });
     } catch (e) {
-      logger.warn(e);
+      logger.warn(String(e));
     }
   }
 

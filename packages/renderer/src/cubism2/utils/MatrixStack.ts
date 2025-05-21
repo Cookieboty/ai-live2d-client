@@ -53,7 +53,7 @@ class MatrixStack {
     return this.currentMatrix;
   }
 
-  static multMatrix(matNew: number[]): void {
+  static multMatrix(matNew: number[] | Float32Array): void {
     let i, j, k;
 
     for (i = 0; i < 16; i++) {
