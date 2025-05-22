@@ -8,6 +8,7 @@
  */
 
 import logger from '@/utils/logger';
+import { customFetch } from '@/utils/utils';
 
 // 声明需要的Live2D类型
 declare const Live2DModelWebGL: {
@@ -34,7 +35,7 @@ class PlatformManager {
     if (path in this.cache) {
       return callback(this.cache[path]);
     }
-    fetch(path)
+    customFetch(path)
       .then(response => response.arrayBuffer())
       .then(arrayBuffer => {
         this.cache[path] = arrayBuffer;
