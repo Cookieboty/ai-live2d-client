@@ -270,11 +270,23 @@ export class L2DBaseModel {
 
     logger.trace('Load Physics : ' + path);
     try {
+      // 检查L2DPhysics是否可用
+      if (typeof L2DPhysics === 'undefined') {
+        logger.warn('L2DPhysics is not available, skipping physics loading');
+        return;
+      }
+
       pm.loadBytes(path, (buf) => {
-        this.physics = L2DPhysics.load(buf);
+        try {
+          this.physics = L2DPhysics.load(buf);
+          logger.trace('Physics loaded successfully');
+        } catch (error) {
+          logger.warn('Failed to load physics data:', error);
+          this.physics = null;
+        }
       });
     } catch (e) {
-      logger.warn(String(e));
+      logger.warn('Error loading physics:', String(e));
     }
   }
 

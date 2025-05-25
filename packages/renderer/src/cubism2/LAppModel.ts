@@ -305,9 +305,39 @@ class LAppModel extends L2DBaseModel {
   startRandomMotion(name: string, priority: number): void {
     if (!this.modelSetting) return;
 
-    const max = this.modelSetting.getMotionNum(name);
+    // 如果指定的motion group不存在，尝试查找第一个可用的motion group
+    let motionGroup = name;
+    if (this.modelSetting.getMotionNum(name) === 0) {
+      // 尝试查找第一个可用的motion group
+      const availableGroups = this.getAvailableMotionGroups();
+      if (availableGroups.length > 0) {
+        motionGroup = availableGroups[0];
+        logger.trace(`Motion group '${name}' not found, using '${motionGroup}' instead`);
+      } else {
+        logger.warn(`No motion groups available for model`);
+        return;
+      }
+    }
+
+    const max = this.modelSetting.getMotionNum(motionGroup);
     const no = parseInt(String(Math.random() * max));
-    this.startMotion(name, no, priority);
+    this.startMotion(motionGroup, no, priority);
+  }
+
+  // 新增方法：获取模型可用的motion groups
+  getAvailableMotionGroups(): string[] {
+    if (!this.modelSetting || !this.modelSetting.json.motions) {
+      return [];
+    }
+
+    const groups: string[] = [];
+    for (const groupName in this.modelSetting.json.motions) {
+      if (this.modelSetting.getMotionNum(groupName) > 0) {
+        groups.push(groupName);
+      }
+    }
+
+    return groups;
   }
 
   startMotion(name: string, no: number, priority: number): void {
