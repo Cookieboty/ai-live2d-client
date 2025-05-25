@@ -1,9 +1,9 @@
 {
     "models": [
-        "Potion-Maker/Pio",
-        "Potion-Maker/Tia",
-        "bilibili-live/22",
-        "bilibili-live/33",
+        "potion-Maker-Pio",
+        "potion-Maker-Tia",
+        "bilibili-22",
+        "bilibili-33",
         [
             "HyperdimensionNeptunia/neptune_classic",
             "HyperdimensionNeptunia/nepnep",
