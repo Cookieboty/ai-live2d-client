@@ -146,22 +146,19 @@ class Cubism2Model {
 
     let scale: number;
 
-    // 对于非常高的模型（如1100x2500），需要特殊处理
-    if (modelAspect < 0.6) {
-      // 非常高的模型：使用更小的缩放，确保头部不被截断
+    // 优化缩放逻辑，防止头部截断
+    if (modelAspect < canvasAspect) {
+      // 模型更高瘦，需要更小的缩放防止截断
       if (modelAspect < 0.5) {
-        scale = 0.8; // 对于极高的模型使用非常小的缩放
+        scale = 1.0; // 极高瘦模型使用更小缩放
+      } else if (modelAspect < 0.7) {
+        scale = 1.3; // 中等高瘦模型
       } else {
-        scale = 1.0; // 对于高模型使用小缩放
+        scale = 1.6; // 轻微高瘦模型
       }
-      logger.info('检测到高瘦模型，使用特殊缩放策略');
-    } else if (modelAspect > canvasAspect) {
-      // 模型更宽，以Canvas宽度为准
-      scale = 2.0;
     } else {
-      // 模型更高，以Canvas高度为准，但限制最大缩放
-      const heightBasedScale = 2.0 * (canvasAspect / modelAspect);
-      scale = Math.min(heightBasedScale, 3.0); // 限制最大缩放避免过度放大
+      // 模型更宽，以宽度为准
+      scale = 2.0;
     }
 
     // 应用缩放和居中
@@ -170,16 +167,33 @@ class Cubism2Model {
       model.modelMatrix.setCenterPosition(0.0, 0.0);
     }
 
-    // 对于高瘦模型，同时调整视图矩阵以扩大垂直视野
-    if (modelAspect < 0.6 && this.viewMatrix) {
+    // 对于高瘦模型，调整视图矩阵以扩大垂直视野
+    if (modelAspect < 1.0 && this.viewMatrix) {
       const ratio = canvasHeight / canvasWidth;
       const left = LAppDefine.VIEW_LOGICAL_LEFT;
       const right = LAppDefine.VIEW_LOGICAL_RIGHT;
-      const bottom = -ratio * 2.0; // 进一步扩大垂直视野
-      const top = ratio * 2.0;
+
+      // 根据模型宽高比动态调整视野扩展
+      let verticalExpansion = 1.0;
+      if (modelAspect < 0.3) {
+        verticalExpansion = 3.0; // 极端高瘦
+      } else if (modelAspect < 0.5) {
+        verticalExpansion = 2.5; // 很高瘦
+      } else if (modelAspect < 0.7) {
+        verticalExpansion = 2.0; // 中等高瘦
+      } else if (modelAspect < 1.0) {
+        verticalExpansion = 1.5; // 轻微高瘦
+      }
+
+      const bottom = -ratio * verticalExpansion;
+      const top = ratio * verticalExpansion;
 
       this.viewMatrix.setScreenRect(left, right, bottom, top);
-      logger.info('为高瘦模型调整视图矩阵，扩大垂直视野');
+      logger.info('为高瘦模型调整视图矩阵，扩大垂直视野:', {
+        modelAspect: modelAspect.toFixed(2),
+        verticalExpansion,
+        viewBounds: { left, right, bottom, top }
+      });
     }
 
     logger.info('模型矩阵设置完成:', {
@@ -251,6 +265,8 @@ class Cubism2Model {
       this.live2DMgr.setDrag(this.dragMgr.getX(), this.dragMgr.getY());
     }
 
+    // 确保每次绘制都有透明背景
+    this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     // 转换Float32Array为number[]类型
@@ -284,6 +300,10 @@ class Cubism2Model {
 
   async changeModelWithJSON(modelSettingPath: string, modelSetting: any): Promise<void> {
     if (this.gl) {
+      // 重置WebGL背景色，确保新模型有透明背景
+      this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
       await this.live2DMgr.changeModelWithJSON(this.gl, modelSettingPath, modelSetting);
 
       // 模型加载完成后，强制应用正确的模型矩阵设置

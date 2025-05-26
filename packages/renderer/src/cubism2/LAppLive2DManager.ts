@@ -59,6 +59,9 @@ class LAppLive2DManager {
     if (this.reloading) return;
     this.reloading = true;
 
+    // 清理WebGL状态，确保背景透明
+    this.clearWebGLState(gl);
+
     const oldModel = this.model;
     const newModel = new LAppModel();
 
@@ -68,6 +71,48 @@ class LAppLive2DManager {
     }
     this.model = newModel;
     this.reloading = false;
+
+    // 再次确保背景透明
+    this.resetWebGLBackground(gl);
+  }
+
+  /**
+   * 清理WebGL状态
+   */
+  private clearWebGLState(gl: WebGLRenderingContext): void {
+    // 设置透明背景色
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+
+    // 多次清除所有缓冲区，确保彻底清理
+    for (let i = 0; i < 3; i++) {
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+    }
+
+    // 强制WebGL完成所有待处理的操作
+    gl.flush();
+    gl.finish();
+
+    // 重置混合状态 - 确保正确的alpha混合
+    gl.disable(gl.BLEND);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendEquation(gl.FUNC_ADD);
+
+    logger.trace('WebGL状态已清理，背景已重置为透明');
+  }
+
+  /**
+   * 重置WebGL背景
+   */
+  private resetWebGLBackground(gl: WebGLRenderingContext): void {
+    // 确保背景色为完全透明
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+
+    // 清除缓冲区
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.flush();
+
+    logger.trace('WebGL背景已重置为透明');
   }
 
   setDrag(x: number, y: number): void {
