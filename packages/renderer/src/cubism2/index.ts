@@ -112,7 +112,7 @@ class Cubism2Model {
   /**
    * 设置正确的模型矩阵 - 参考Live2D官方最佳实践
    */
-  private setupModelMatrix(): void {
+  setupModelMatrix(): void {
     const model = this.live2DMgr.getModel();
     if (!model || !model.live2DModel) {
       return;
