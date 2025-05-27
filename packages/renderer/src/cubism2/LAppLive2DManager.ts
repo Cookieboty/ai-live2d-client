@@ -84,13 +84,24 @@ class LAppLive2DManager {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
     // 多次清除所有缓冲区，确保彻底清理
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+      if (i < 3) {
+        gl.flush();
+        gl.finish();
+      }
     }
 
-    // 强制WebGL完成所有待处理的操作
-    gl.flush();
-    gl.finish();
+    // 删除所有纹理对象，防止纹理残留
+    const maxTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+    for (let i = 0; i < maxTextureUnits; i++) {
+      gl.activeTexture(gl.TEXTURE0 + i);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+    // 重置像素存储参数
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
     // 重置混合状态 - 确保正确的alpha混合
     gl.disable(gl.BLEND);
@@ -98,7 +109,21 @@ class LAppLive2DManager {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.blendEquation(gl.FUNC_ADD);
 
-    logger.trace('WebGL状态已清理，背景已重置为透明');
+    // 重置深度测试和模板测试
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    gl.depthMask(true);
+    gl.disable(gl.STENCIL_TEST);
+
+    // 重置视口
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    // 最后再次清除缓冲区
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+    gl.flush();
+    gl.finish();
+
+    logger.trace('WebGL状态已彻底清理，背景已重置为透明');
   }
 
   /**
@@ -108,11 +133,25 @@ class LAppLive2DManager {
     // 确保背景色为完全透明
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
-    // 清除缓冲区
+    // 多次清除缓冲区以确保彻底清理
+    for (let i = 0; i < 5; i++) {
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      if (i < 2) {
+        gl.flush();
+        gl.finish();
+      }
+    }
+
+    // 重置像素存储参数
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+
+    // 再次设置透明背景并清除
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.flush();
 
-    logger.trace('WebGL背景已重置为透明');
+    logger.trace('WebGL背景已彻底重置为透明');
   }
 
   setDrag(x: number, y: number): void {

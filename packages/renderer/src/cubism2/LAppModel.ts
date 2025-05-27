@@ -192,6 +192,10 @@ class LAppModel extends L2DBaseModel {
   }
 
   release(gl: WebGLRenderingContext): void {
+    // 清理背景缓冲区
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
     // 获取平台管理器
     const pm = Live2DFramework.getPlatformManager();
 
@@ -199,6 +203,37 @@ class LAppModel extends L2DBaseModel {
     if (pm && gl && (pm as any).texture) {
       gl.deleteTexture((pm as any).texture);
     }
+
+    // 确保WebGL状态完全重置
+    gl.disable(gl.BLEND);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    // 重置模型参数
+    if (this.live2DModel) {
+      // 重置所有参数到默认值
+      this.live2DModel.setParamFloat('PARAM_ANGLE_X', 0);
+      this.live2DModel.setParamFloat('PARAM_ANGLE_Y', 0);
+      this.live2DModel.setParamFloat('PARAM_ANGLE_Z', 0);
+      this.live2DModel.setParamFloat('PARAM_EYE_BALL_X', 0);
+      this.live2DModel.setParamFloat('PARAM_EYE_BALL_Y', 0);
+      this.live2DModel.setParamFloat('PARAM_BODY_ANGLE_X', 0);
+    }
+
+    // 重置模型状态
+    this.setInitialized(false);
+    this.setUpdating(false);
+
+    // 清理模型设置
+    this.modelSetting = null;
+    this.modelHomeDir = '';
+
+    // 最后再次清理背景，确保彻底清除
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.flush();
+
+    logger.info('模型已释放，背景和状态已完全清理');
   }
 
   preloadMotionGroup(name: string): void {
