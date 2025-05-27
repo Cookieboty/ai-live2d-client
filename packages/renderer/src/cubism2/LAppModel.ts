@@ -20,6 +20,10 @@ class LAppModel extends L2DBaseModel {
   modelSetting: ModelSettingJson | null = null;
   tmpMatrix: number[] = [];
 
+  // 添加标志来跟踪模型是否有动作组
+  private hasMotions: boolean = false;
+  private motionsChecked: boolean = false;
+
   constructor() {
     super();
   }
@@ -131,6 +135,15 @@ class LAppModel extends L2DBaseModel {
             this.preloadMotionGroup(LAppDefine.MOTION_GROUP_IDLE);
             this.mainMotionManager.stopAllMotions();
 
+            // 隐藏背景部件，确保透明背景
+            this.hideBackgroundParts();
+
+            // 确保Pose系统在模型初始化完成后立即应用
+            if (this.pose != null && this.live2DModel) {
+              this.pose.updateParam(this.live2DModel);
+              logger.info('Pose system applied after model initialization');
+            }
+
             this.setUpdating(false);
             this.setInitialized(true);
 
@@ -151,6 +164,13 @@ class LAppModel extends L2DBaseModel {
     );
 
     this.modelSetting = new ModelSettingJson();
+
+    // 移除背景字段，防止加载背景图片导致阴影
+    if (modelSetting && modelSetting.background) {
+      console.log('检测到模型配置中的背景字段，已移除以确保透明背景:', modelSetting.background);
+      delete modelSetting.background;
+    }
+
     this.modelSetting.json = modelSetting;
     await new Promise<void>(resolve => this.loadJSON(resolve));
   }
@@ -197,6 +217,21 @@ class LAppModel extends L2DBaseModel {
     }
   }
 
+  // 检查模型是否有可用的动作组
+  private checkMotionsAvailability(): void {
+    if (this.motionsChecked) return;
+
+    const availableGroups = this.getAvailableMotionGroups();
+    this.hasMotions = availableGroups.length > 0;
+    this.motionsChecked = true;
+
+    if (!this.hasMotions) {
+      logger.info('模型没有动作组配置，已禁用动作播放功能');
+    } else {
+      logger.info(`模型包含 ${availableGroups.length} 个动作组: ${availableGroups.join(', ')}`);
+    }
+  }
+
   update(): void {
     if (this.live2DModel == null) {
       logger.error('Failed to update.');
@@ -207,12 +242,22 @@ class LAppModel extends L2DBaseModel {
     const timeSec = timeMSec / 1000.0;
     const t = timeSec * 2 * Math.PI;
 
-    if (this.mainMotionManager.isFinished()) {
-      this.startRandomMotion(
-        LAppDefine.MOTION_GROUP_IDLE,
-        LAppDefine.PRIORITY_IDLE,
-      );
+    // 检查模型动作组可用性（只检查一次）
+    this.checkMotionsAvailability();
+
+    // 只有当模型有动作组时才尝试播放动作
+    if (this.hasMotions && this.mainMotionManager.isFinished()) {
+      const availableGroups = this.getAvailableMotionGroups();
+      if (availableGroups.length > 0) {
+        // 优先尝试播放idle动作，如果没有则使用第一个可用的动作组
+        const targetGroup = availableGroups.includes(LAppDefine.MOTION_GROUP_IDLE)
+          ? LAppDefine.MOTION_GROUP_IDLE
+          : availableGroups[0];
+
+        this.startRandomMotion(targetGroup, LAppDefine.PRIORITY_IDLE);
+      }
     }
+    // 如果模型没有动作组，完全跳过动作播放逻辑
 
     //-----------------------------------------------------------------
 
@@ -286,9 +331,20 @@ class LAppModel extends L2DBaseModel {
 
     if (this.pose != null) {
       this.pose.updateParam(this.live2DModel);
+      // 添加调试日志，确保Pose系统正在工作
+      logger.trace('Pose system updated in main update loop');
+    } else {
+      // 如果没有pose，记录警告
+      logger.trace('No pose configuration available for this model in update loop');
     }
 
+    // 确保背景部件始终隐藏
+    this.hideBackgroundParts();
+
     this.live2DModel.update();
+
+    // 在每次更新后强制隐藏背景部件，防止动作文件激活背景
+    this.hideBackgroundParts();
   }
 
   setRandomExpression(): void {
@@ -305,9 +361,41 @@ class LAppModel extends L2DBaseModel {
   startRandomMotion(name: string, priority: number): void {
     if (!this.modelSetting) return;
 
-    const max = this.modelSetting.getMotionNum(name);
+    // 如果指定的motion group不存在，尝试查找第一个可用的motion group
+    let motionGroup = name;
+    if (this.modelSetting.getMotionNum(name) === 0) {
+      const availableGroups = this.getAvailableMotionGroups();
+      if (availableGroups.length > 0) {
+        motionGroup = availableGroups[0];
+        logger.trace(`Motion group '${name}' not found, using '${motionGroup}' instead`);
+      } else {
+        // 这种情况理论上不应该发生，因为我们已经在update方法中检查过了
+        logger.warn(`No motion groups available for model`);
+        return;
+      }
+    }
+
+    const max = this.modelSetting.getMotionNum(motionGroup);
+    if (max <= 0) return;
+
     const no = parseInt(String(Math.random() * max));
-    this.startMotion(name, no, priority);
+    this.startMotion(motionGroup, no, priority);
+  }
+
+  // 新增方法：获取模型可用的motion groups
+  getAvailableMotionGroups(): string[] {
+    if (!this.modelSetting || !this.modelSetting.json.motions) {
+      return [];
+    }
+
+    const groups: string[] = [];
+    for (const groupName in this.modelSetting.json.motions) {
+      if (this.modelSetting.getMotionNum(groupName) > 0) {
+        groups.push(groupName);
+      }
+    }
+
+    return groups;
   }
 
   startMotion(name: string, no: number, priority: number): void {
@@ -333,12 +421,65 @@ class LAppModel extends L2DBaseModel {
       this.loadMotion(null, this.modelHomeDir + motionName, mtn => {
         motion = mtn;
 
+        // 在动作加载完成后，隐藏背景部件
+        this.hideBackgroundParts();
+
         this.setFadeInFadeOut(name, no, priority, motion);
       });
     } else {
       motion = this.motions[name];
 
+      // 在动作开始前，隐藏背景部件
+      this.hideBackgroundParts();
+
       this.setFadeInFadeOut(name, no, priority, motion);
+    }
+  }
+
+  /**
+   * 隐藏模型的背景部件
+   */
+  private hideBackgroundParts(): void {
+    if (!this.live2DModel) return;
+
+    // 隐藏常见的背景部件
+    const backgroundParts = [
+      'PARTS_01_BACKGROUND',
+      'PARTS_BACKGROUND',
+      'BACKGROUND',
+      'BG'
+    ];
+
+    backgroundParts.forEach(partId => {
+      try {
+        // 强制设置背景部件为完全不可见
+        this.live2DModel.setPartsOpacity(partId, 0);
+
+        // 使用setParamFloat方法强制设置背景可见性参数为0
+        try {
+          this.live2DModel.setParamFloat(`VISIBLE:${partId}`, 0);
+        } catch (e) {
+          // 忽略参数不存在的错误
+        }
+
+        // 尝试直接设置部件可见性参数（不带VISIBLE前缀）
+        try {
+          this.live2DModel.setParamFloat(partId, 0);
+        } catch (e) {
+          // 忽略参数不存在的错误
+        }
+
+        logger.trace(`已强制隐藏背景部件: ${partId}`);
+      } catch (error) {
+        // 如果部件不存在，忽略错误
+      }
+    });
+
+    // 强制更新模型以应用参数变化
+    try {
+      this.live2DModel.update();
+    } catch (e) {
+      // 忽略更新错误
     }
   }
 
@@ -352,6 +493,9 @@ class LAppModel extends L2DBaseModel {
     motion.setFadeOut(this.modelSetting.getMotionFadeOut(name, no));
 
     logger.trace('Start motion : ' + motionName);
+
+    // 在动作开始前强制隐藏背景部件
+    this.hideBackgroundParts();
 
     if (this.modelSetting.getMotionSound(name, no) == null) {
       this.mainMotionManager.startMotionPrio(motion, priority);
@@ -367,6 +511,11 @@ class LAppModel extends L2DBaseModel {
       snd.play();
       this.mainMotionManager.startMotionPrio(motion, priority);
     }
+
+    // 在动作开始后再次确保背景部件隐藏
+    setTimeout(() => {
+      this.hideBackgroundParts();
+    }, 50);
   }
 
   setExpression(name: string): void {
