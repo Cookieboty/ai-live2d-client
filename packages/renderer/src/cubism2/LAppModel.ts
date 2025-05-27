@@ -20,6 +20,10 @@ class LAppModel extends L2DBaseModel {
   modelSetting: ModelSettingJson | null = null;
   tmpMatrix: number[] = [];
 
+  // 添加标志来跟踪模型是否有动作组
+  private hasMotions: boolean = false;
+  private motionsChecked: boolean = false;
+
   constructor() {
     super();
   }
@@ -207,6 +211,21 @@ class LAppModel extends L2DBaseModel {
     }
   }
 
+  // 检查模型是否有可用的动作组
+  private checkMotionsAvailability(): void {
+    if (this.motionsChecked) return;
+
+    const availableGroups = this.getAvailableMotionGroups();
+    this.hasMotions = availableGroups.length > 0;
+    this.motionsChecked = true;
+
+    if (!this.hasMotions) {
+      logger.info('模型没有动作组配置，已禁用动作播放功能');
+    } else {
+      logger.info(`模型包含 ${availableGroups.length} 个动作组: ${availableGroups.join(', ')}`);
+    }
+  }
+
   update(): void {
     if (this.live2DModel == null) {
       logger.error('Failed to update.');
@@ -217,12 +236,22 @@ class LAppModel extends L2DBaseModel {
     const timeSec = timeMSec / 1000.0;
     const t = timeSec * 2 * Math.PI;
 
-    if (this.mainMotionManager.isFinished()) {
-      this.startRandomMotion(
-        LAppDefine.MOTION_GROUP_IDLE,
-        LAppDefine.PRIORITY_IDLE,
-      );
+    // 检查模型动作组可用性（只检查一次）
+    this.checkMotionsAvailability();
+
+    // 只有当模型有动作组时才尝试播放动作
+    if (this.hasMotions && this.mainMotionManager.isFinished()) {
+      const availableGroups = this.getAvailableMotionGroups();
+      if (availableGroups.length > 0) {
+        // 优先尝试播放idle动作，如果没有则使用第一个可用的动作组
+        const targetGroup = availableGroups.includes(LAppDefine.MOTION_GROUP_IDLE)
+          ? LAppDefine.MOTION_GROUP_IDLE
+          : availableGroups[0];
+
+        this.startRandomMotion(targetGroup, LAppDefine.PRIORITY_IDLE);
+      }
     }
+    // 如果模型没有动作组，完全跳过动作播放逻辑
 
     //-----------------------------------------------------------------
 
@@ -324,18 +353,20 @@ class LAppModel extends L2DBaseModel {
     // 如果指定的motion group不存在，尝试查找第一个可用的motion group
     let motionGroup = name;
     if (this.modelSetting.getMotionNum(name) === 0) {
-      // 尝试查找第一个可用的motion group
       const availableGroups = this.getAvailableMotionGroups();
       if (availableGroups.length > 0) {
         motionGroup = availableGroups[0];
         logger.trace(`Motion group '${name}' not found, using '${motionGroup}' instead`);
       } else {
+        // 这种情况理论上不应该发生，因为我们已经在update方法中检查过了
         logger.warn(`No motion groups available for model`);
         return;
       }
     }
 
     const max = this.modelSetting.getMotionNum(motionGroup);
+    if (max <= 0) return;
+
     const no = parseInt(String(Math.random() * max));
     this.startMotion(motionGroup, no, priority);
   }
