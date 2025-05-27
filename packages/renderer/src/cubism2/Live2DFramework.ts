@@ -267,9 +267,67 @@ export class L2DBaseModel {
 
     logger.trace('Load Pose : ' + path);
 
-    // 姿势功能是可选的，如果不支持则跳过
-    logger.info('Pose loading is optional and may not be supported by this Live2D version');
-    if (typeof callback == 'function') callback();
+    // 检查是否支持L2DPose
+    if (typeof window !== 'undefined' && window.L2DPose) {
+      pm.loadBytes(path, (buf: ArrayBuffer) => {
+        try {
+          this.pose = window.L2DPose.load(buf);
+          logger.info('Pose loaded successfully: ' + path);
+
+          // 立即应用pose设置，确保正确的部件显示
+          if (this.pose && this.live2DModel) {
+            this.pose.updateParam(this.live2DModel);
+            logger.info('Pose applied to model');
+          }
+        } catch (error) {
+          logger.warn('Failed to load pose: ' + error);
+          this.pose = null;
+        }
+
+        if (typeof callback === 'function') callback();
+      });
+    } else {
+      // 如果不支持L2DPose，尝试手动解析pose.json并应用
+      logger.info('L2DPose not available, attempting manual pose parsing');
+      pm.loadBytes(path, (buf: ArrayBuffer) => {
+        try {
+          const poseData = pm.jsonParseFromBytes(buf);
+          this.applyManualPose(poseData);
+          logger.info('Manual pose applied: ' + path);
+        } catch (error) {
+          logger.warn('Failed to parse pose manually: ' + error);
+        }
+
+        if (typeof callback === 'function') callback();
+      });
+    }
+  }
+
+  // 手动应用Pose配置的方法
+  private applyManualPose(poseData: any): void {
+    if (!poseData || !poseData.parts_visible || !this.live2DModel) {
+      return;
+    }
+
+    logger.info('Applying manual pose configuration');
+
+    // 遍历所有部件组
+    poseData.parts_visible.forEach((group: any, groupIndex: number) => {
+      if (group.group && Array.isArray(group.group)) {
+        // 在每个组中，只显示第一个部件，隐藏其他部件
+        group.group.forEach((part: any, partIndex: number) => {
+          if (part.id) {
+            const opacity = partIndex === 0 ? 1.0 : 0.0; // 只显示第一个部件
+            try {
+              this.live2DModel.setPartsOpacity(part.id, opacity);
+              logger.trace(`Set part ${part.id} opacity to ${opacity}`);
+            } catch (error) {
+              logger.trace(`Part ${part.id} not found in model`);
+            }
+          }
+        });
+      }
+    });
   }
 
   // 加载物理属性

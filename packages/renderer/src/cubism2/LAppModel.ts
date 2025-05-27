@@ -138,6 +138,12 @@ class LAppModel extends L2DBaseModel {
             // 隐藏背景部件，确保透明背景
             this.hideBackgroundParts();
 
+            // 确保Pose系统在模型初始化完成后立即应用
+            if (this.pose != null && this.live2DModel) {
+              this.pose.updateParam(this.live2DModel);
+              logger.info('Pose system applied after model initialization');
+            }
+
             this.setUpdating(false);
             this.setInitialized(true);
 
@@ -325,6 +331,11 @@ class LAppModel extends L2DBaseModel {
 
     if (this.pose != null) {
       this.pose.updateParam(this.live2DModel);
+      // 添加调试日志，确保Pose系统正在工作
+      logger.trace('Pose system updated in main update loop');
+    } else {
+      // 如果没有pose，记录警告
+      logger.trace('No pose configuration available for this model in update loop');
     }
 
     // 确保背景部件始终隐藏

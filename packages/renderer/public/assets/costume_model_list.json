@@ -23,7 +23,22 @@
     {
       "name": "33.2018.lover",
       "path": "33.2018.lover/model.default.json",
-      "message": "33号舰娘"
+      "message": "33号舰娘",
+      "costumes": [
+        "33.2018.lover/33.2018.lover.model.json",
+        "33.2018.lover/model.2016.xmas.1.json",
+        "33.2018.lover/model.2016.xmas.2.json",
+        "33.2018.lover/model.2017.cba-normal.json",
+        "33.2018.lover/model.2017.newyear.json",
+        "33.2018.lover/model.2017.school.json",
+        "33.2018.lover/model.2017.summer.normal.1.json",
+        "33.2018.lover/model.2017.summer.normal.2.json",
+        "33.2018.lover/model.2017.tomo-bukatsu.high.json",
+        "33.2018.lover/model.2017.tomo-bukatsu.low.json",
+        "33.2018.lover/model.2017.valley.json",
+        "33.2018.lover/model.2017.vdays.json",
+        "33.2018.lover/model.2018.spring.json"
+      ]
     },
     {
       "name": "95type_405",
@@ -108,7 +123,10 @@
     {
       "name": "date_16",
       "path": "date_16/date_16.model.json",
-      "message": "DATE (少女前线)"
+      "message": "DATE (少女前线)",
+      "costumes": [
+        "date_16/physics_date.json"
+      ]
     },
     {
       "name": "dsr50_1801",
@@ -173,7 +191,10 @@
     {
       "name": "hallo_16",
       "path": "hallo_16/hallo_16.model.json",
-      "message": "HALLO (少女前线)"
+      "message": "HALLO (少女前线)",
+      "costumes": [
+        "hallo_16/physics_hallo.json"
+      ]
     },
     {
       "name": "haru01",
@@ -306,17 +327,28 @@
     {
       "name": "len_impact",
       "path": "len_impact/len_impact.model.json",
-      "message": "LEN (少女前线)"
+      "message": "LEN (少女前线)",
+      "costumes": [
+        "len_impact/physics_space.json",
+        "len_impact/pose_impact.json"
+      ]
     },
     {
       "name": "len_space",
       "path": "len_space/len_space.model.json",
-      "message": "LEN (少女前线)"
+      "message": "LEN (少女前线)",
+      "costumes": [
+        "len_space/physics_space.json",
+        "len_space/pose_space.json"
+      ]
     },
     {
       "name": "len_swim",
       "path": "len_swim/len_swim.model.json",
-      "message": "LEN (少女前线)"
+      "message": "LEN (少女前线)",
+      "costumes": [
+        "len_swim/physics_swim.json"
+      ]
     },
     {
       "name": "lewis_3502",
@@ -425,6 +457,11 @@
       "name": "penchan",
       "path": "penchan/penchan.model.json",
       "message": "penchan"
+    },
+    {
+      "name": "Pio",
+      "path": "Pio/index.json",
+      "message": "Pio"
     },
     {
       "name": "pkp_1201",
@@ -613,8 +650,11 @@
     },
     {
       "name": "wed_16",
-      "path": "wed_16/wed_16.model.json",
-      "message": "WED (少女前线)"
+      "path": "wed_16/physics_wed.json",
+      "message": "WED (少女前线)",
+      "costumes": [
+        "wed_16/wed_16.model.json"
+      ]
     },
     {
       "name": "welrod_1401",
