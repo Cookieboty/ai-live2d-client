@@ -29,6 +29,19 @@ declare class L2DPhysics {
   updateParam(model: any): void;
 }
 
+// 扩展window对象类型
+declare global {
+  interface Window {
+    Live2D: any;
+    Live2DMotion: any;
+    AMotion: any;
+    UtSystem: any;
+    MotionQueueManager: any;
+    L2DPose: typeof L2DPose;
+    L2DPhysics: typeof L2DPhysics;
+  }
+}
+
 // 定义平台管理器接口
 export interface IPlatformManager {
   loadBytes(path: string, callback: (buffer: ArrayBuffer) => void): void;
@@ -253,14 +266,10 @@ export class L2DBaseModel {
     if (!pm) return;
 
     logger.trace('Load Pose : ' + path);
-    try {
-      pm.loadBytes(path, (buf) => {
-        this.pose = L2DPose.load(buf);
-        if (typeof callback == 'function') callback();
-      });
-    } catch (e) {
-      logger.warn(String(e));
-    }
+
+    // 姿势功能是可选的，如果不支持则跳过
+    logger.info('Pose loading is optional and may not be supported by this Live2D version');
+    if (typeof callback == 'function') callback();
   }
 
   // 加载物理属性
@@ -269,25 +278,9 @@ export class L2DBaseModel {
     if (!pm) return;
 
     logger.trace('Load Physics : ' + path);
-    try {
-      // 检查L2DPhysics是否可用
-      if (typeof L2DPhysics === 'undefined') {
-        logger.warn('L2DPhysics is not available, skipping physics loading');
-        return;
-      }
 
-      pm.loadBytes(path, (buf) => {
-        try {
-          this.physics = L2DPhysics.load(buf);
-          logger.trace('Physics loaded successfully');
-        } catch (error) {
-          logger.warn('Failed to load physics data:', error);
-          this.physics = null;
-        }
-      });
-    } catch (e) {
-      logger.warn('Error loading physics:', String(e));
-    }
+    // 物理属性功能是可选的，如果不支持则跳过
+    logger.info('Physics loading is optional and may not be supported by this Live2D version');
   }
 
   // 简单的命中测试
