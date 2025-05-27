@@ -131,6 +131,9 @@ class LAppModel extends L2DBaseModel {
             this.preloadMotionGroup(LAppDefine.MOTION_GROUP_IDLE);
             this.mainMotionManager.stopAllMotions();
 
+            // 隐藏背景部件，确保透明背景
+            this.hideBackgroundParts();
+
             this.setUpdating(false);
             this.setInitialized(true);
 
@@ -151,6 +154,13 @@ class LAppModel extends L2DBaseModel {
     );
 
     this.modelSetting = new ModelSettingJson();
+
+    // 移除背景字段，防止加载背景图片导致阴影
+    if (modelSetting && modelSetting.background) {
+      console.log('检测到模型配置中的背景字段，已移除以确保透明背景:', modelSetting.background);
+      delete modelSetting.background;
+    }
+
     this.modelSetting.json = modelSetting;
     await new Promise<void>(resolve => this.loadJSON(resolve));
   }
@@ -288,7 +298,13 @@ class LAppModel extends L2DBaseModel {
       this.pose.updateParam(this.live2DModel);
     }
 
+    // 确保背景部件始终隐藏
+    this.hideBackgroundParts();
+
     this.live2DModel.update();
+
+    // 在每次更新后强制隐藏背景部件，防止动作文件激活背景
+    this.hideBackgroundParts();
   }
 
   setRandomExpression(): void {
@@ -363,12 +379,65 @@ class LAppModel extends L2DBaseModel {
       this.loadMotion(null, this.modelHomeDir + motionName, mtn => {
         motion = mtn;
 
+        // 在动作加载完成后，隐藏背景部件
+        this.hideBackgroundParts();
+
         this.setFadeInFadeOut(name, no, priority, motion);
       });
     } else {
       motion = this.motions[name];
 
+      // 在动作开始前，隐藏背景部件
+      this.hideBackgroundParts();
+
       this.setFadeInFadeOut(name, no, priority, motion);
+    }
+  }
+
+  /**
+   * 隐藏模型的背景部件
+   */
+  private hideBackgroundParts(): void {
+    if (!this.live2DModel) return;
+
+    // 隐藏常见的背景部件
+    const backgroundParts = [
+      'PARTS_01_BACKGROUND',
+      'PARTS_BACKGROUND',
+      'BACKGROUND',
+      'BG'
+    ];
+
+    backgroundParts.forEach(partId => {
+      try {
+        // 强制设置背景部件为完全不可见
+        this.live2DModel.setPartsOpacity(partId, 0);
+
+        // 使用setParamFloat方法强制设置背景可见性参数为0
+        try {
+          this.live2DModel.setParamFloat(`VISIBLE:${partId}`, 0);
+        } catch (e) {
+          // 忽略参数不存在的错误
+        }
+
+        // 尝试直接设置部件可见性参数（不带VISIBLE前缀）
+        try {
+          this.live2DModel.setParamFloat(partId, 0);
+        } catch (e) {
+          // 忽略参数不存在的错误
+        }
+
+        logger.trace(`已强制隐藏背景部件: ${partId}`);
+      } catch (error) {
+        // 如果部件不存在，忽略错误
+      }
+    });
+
+    // 强制更新模型以应用参数变化
+    try {
+      this.live2DModel.update();
+    } catch (e) {
+      // 忽略更新错误
     }
   }
 
@@ -382,6 +451,9 @@ class LAppModel extends L2DBaseModel {
     motion.setFadeOut(this.modelSetting.getMotionFadeOut(name, no));
 
     logger.trace('Start motion : ' + motionName);
+
+    // 在动作开始前强制隐藏背景部件
+    this.hideBackgroundParts();
 
     if (this.modelSetting.getMotionSound(name, no) == null) {
       this.mainMotionManager.startMotionPrio(motion, priority);
@@ -397,6 +469,11 @@ class LAppModel extends L2DBaseModel {
       snd.play();
       this.mainMotionManager.startMotionPrio(motion, priority);
     }
+
+    // 在动作开始后再次确保背景部件隐藏
+    setTimeout(() => {
+      this.hideBackgroundParts();
+    }, 50);
   }
 
   setExpression(name: string): void {

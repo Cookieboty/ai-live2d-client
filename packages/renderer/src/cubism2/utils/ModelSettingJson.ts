@@ -22,6 +22,7 @@ class ModelSettingJson {
   private readonly INIT_PARTS_VISIBLE: string = 'init_parts_visible';
   private readonly VALUE: string = 'val';
   private readonly FILE: string = 'file';
+  private readonly BACKGROUND: string = 'background';
 
   public json: ModelJson = {};
 
@@ -32,6 +33,13 @@ class ModelSettingJson {
     pm.loadBytes(path, (buf: ArrayBuffer) => {
       const str = String.fromCharCode.apply(null, new Uint8Array(buf) as any);
       this.json = JSON.parse(str);
+
+      // 移除背景字段，防止加载背景图片导致阴影
+      if (this.json[this.BACKGROUND]) {
+        console.log('检测到模型配置中的背景字段，已移除以确保透明背景:', this.json[this.BACKGROUND]);
+        delete this.json[this.BACKGROUND];
+      }
+
       callback();
     });
   }
