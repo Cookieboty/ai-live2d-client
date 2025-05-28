@@ -41,11 +41,6 @@
       "message": "CBJMS (少女前线)"
     },
     {
-      "name": "chiaki_kitty",
-      "path": "chiaki_kitty/chiaki_kitty.model.json",
-      "message": "CHIAKI (少女前线)"
-    },
-    {
       "name": "chino",
       "path": "chino/model.json",
       "message": "智乃"
@@ -63,10 +58,7 @@
     {
       "name": "date_16",
       "path": "date_16/date_16.model.json",
-      "message": "DATE (少女前线)",
-      "costumes": [
-        "date_16/physics_date.json"
-      ]
+      "message": "DATE (少女前线)"
     },
     {
       "name": "dsr50_1801",
@@ -116,10 +108,7 @@
     {
       "name": "hallo_16",
       "path": "hallo_16/hallo_16.model.json",
-      "message": "HALLO (少女前线)",
-      "costumes": [
-        "hallo_16/physics_hallo.json"
-      ]
+      "message": "HALLO (少女前线)"
     },
     {
       "name": "hibiki",
@@ -220,14 +209,6 @@
       "name": "madoka",
       "path": "madoka/model.json",
       "message": "小圆"
-    },
-    {
-      "name": "makoto0",
-      "path": "makoto0/makoto.model.json",
-      "message": "makoto0",
-      "costumes": [
-        "makoto0/makoto0.model.json"
-      ]
     },
     {
       "name": "mikoto",
