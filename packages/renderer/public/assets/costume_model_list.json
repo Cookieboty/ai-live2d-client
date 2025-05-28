@@ -36,16 +36,6 @@
       "message": "布洛妮娅"
     },
     {
-      "name": "carcano1891_2201",
-      "path": "carcano1891_2201/carcano1891_2201.model.json",
-      "message": "CARCANO1891 (少女前线)"
-    },
-    {
-      "name": "carcano1938_2202",
-      "path": "carcano1938_2202/carcano1938_2202.model.json",
-      "message": "CARCANO1938 (少女前线)"
-    },
-    {
       "name": "cbjms_3503",
       "path": "cbjms_3503/cbjms_3503.model.json",
       "message": "CBJMS (少女前线)"
@@ -117,16 +107,6 @@
       "name": "g41_2401",
       "path": "g41_2401/g41_2401.model.json",
       "message": "G41 (少女前线)"
-    },
-    {
-      "name": "Gantzert_Felixander",
-      "path": "Gantzert_Felixander/Gantzert_Felixander.model.json",
-      "message": "GANTZERT (少女前线)"
-    },
-    {
-      "name": "gelina",
-      "path": "gelina/gelina.model.json",
-      "message": "gelina"
     },
     {
       "name": "grizzly_2102",

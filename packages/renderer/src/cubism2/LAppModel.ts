@@ -562,6 +562,13 @@ class LAppModel extends L2DBaseModel {
   }
 
   draw(gl: WebGLRenderingContext): void {
+    // 在每次绘制前强制确保透明背景
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+
+    // 确保使用适合预乘alpha的混合模式
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
     MatrixStack.push();
 
     if (this.modelMatrix) {
@@ -573,6 +580,10 @@ class LAppModel extends L2DBaseModel {
     this.live2DModel.draw();
 
     MatrixStack.pop();
+
+    // 关键修复：在模型绘制完成后强制清除背景色，防止残留
+    // 这是根据Live2D社区论坛的解决方案
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
   }
 
   hitTest(id: string, testX: number, testY: number): boolean {

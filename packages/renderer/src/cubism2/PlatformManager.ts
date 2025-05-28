@@ -15,6 +15,8 @@ declare const Live2DModelWebGL: {
   loadModel(buffer: ArrayBuffer): Live2DModel;
 };
 
+
+
 interface Live2DModel {
   isPremultipliedAlpha(): boolean;
   setTexture(textureNo: number, texture: WebGLTexture): void;
@@ -71,19 +73,27 @@ class PlatformManager {
     loadedImage.src = path;
 
     loadedImage.onload = () => {
-      // create texture
+      // create texture - 使用与Live2D主上下文一致的配置
       const canvas = document.getElementById('live2d') as HTMLCanvasElement;
-      const gl = canvas.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: true }) as WebGLRenderingContext;
+      let gl = canvas.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: false }) as WebGLRenderingContext;
+      if (!gl) {
+        // fallback to webgl1
+        gl = canvas.getContext('webgl', { premultipliedAlpha: true, preserveDrawingBuffer: false }) as WebGLRenderingContext;
+        if (!gl) {
+          logger.error('Failed to create WebGL context.');
+          return;
+        }
+      }
+
       let texture = gl.createTexture();
       if (!texture) {
         logger.error('Failed to generate gl texture name.');
         return;
       }
 
-      if (model.isPremultipliedAlpha() == false) {
-        // 非乘算済アルファテクスチャ以外の场合
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-      }
+      // 根据模型的alpha设置来处理纹理
+      // Live2D Web版本要求UNPACK_PREMULTIPLY_ALPHA_WEBGL必须设置为true
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, texture);

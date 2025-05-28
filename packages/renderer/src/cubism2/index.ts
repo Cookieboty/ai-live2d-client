@@ -90,15 +90,41 @@ class Cubism2Model {
     this.deviceToScreen.multTranslate(-width / 2.0, -height / 2.0);
     this.deviceToScreen.multScale(2 / width, -2 / width);
 
-    // 初始化WebGL上下文
-    this.gl = this.canvas.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: true }) as WebGLRenderingContext;
+    // 初始化WebGL上下文 - 按照Live2D官方要求配置
+    this.gl = this.canvas.getContext('webgl2', {
+      alpha: true,                    // 启用alpha通道
+      premultipliedAlpha: true,       // Live2D要求启用预乘alpha
+      preserveDrawingBuffer: false,   // 禁用缓冲区保留，避免残留
+      antialias: true,               // 启用抗锯齿
+      depth: true,                   // 启用深度缓冲
+      stencil: false                 // 禁用模板缓冲
+    }) as WebGLRenderingContext;
+
+    if (!this.gl) {
+      // 尝试fallback到webgl1
+      this.gl = this.canvas.getContext('webgl', {
+        alpha: true,
+        premultipliedAlpha: true,      // Live2D要求启用预乘alpha
+        preserveDrawingBuffer: false,
+        antialias: true,
+        depth: true,
+        stencil: false
+      }) as WebGLRenderingContext;
+    }
+
     if (!this.gl) {
       logger.error('Failed to create WebGL context.');
       return;
     }
 
     (Live2D as any).setGL(this.gl);
+
+    // 设置透明背景并启用适合预乘alpha的混合模式
     this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    this.gl.enable(this.gl.BLEND);
+    // 使用适合预乘alpha的混合函数
+    this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
     // 加载模型
     await this.changeModelWithJSON(modelSettingPath, modelSetting);
@@ -265,9 +291,19 @@ class Cubism2Model {
       this.live2DMgr.setDrag(this.dragMgr.getX(), this.dragMgr.getY());
     }
 
+    // 强制设置Canvas元素背景为透明
+    if (this.canvas) {
+      this.canvas.style.background = 'transparent';
+      this.canvas.style.backgroundColor = 'transparent';
+    }
+
     // 确保每次绘制都有透明背景
     this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
+
+    // 强制设置适合预乘alpha的混合模式
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
 
     // 转换Float32Array为number[]类型
     if (this.projMatrix && this.viewMatrix) {
@@ -282,7 +318,13 @@ class Cubism2Model {
 
     const model = this.live2DMgr.getModel();
 
-    if (model == null) return;
+    if (model == null) {
+      // 即使没有模型也要清除背景
+      this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
+      MatrixStack.pop();
+      return;
+    }
 
     if (model.initialized && !model.updating) {
       model.update();
@@ -290,6 +332,10 @@ class Cubism2Model {
     }
 
     MatrixStack.pop();
+
+    // 关键修复：在绘制完成后强制清除背景色，防止残留
+    // 这是根据Live2D社区论坛的解决方案
+    this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
   }
 
   async changeModel(modelSettingPath: string): Promise<void> {
