@@ -1,46 +1,6 @@
 {
   "models": [
     {
-      "name": "22.2018.lover",
-      "path": "22.2018.lover/22.default.model.json",
-      "message": "22号舰娘",
-      "costumes": [
-        "22.2018.lover/22.2017.cba-normal.model.json",
-        "22.2018.lover/22.2017.newyear.model.json",
-        "22.2018.lover/22.2017.school.model.json",
-        "22.2018.lover/22.2017.summer.normal.1.model.json",
-        "22.2018.lover/22.2017.summer.normal.2.model.json",
-        "22.2018.lover/22.2017.tomo-bukatsu.high.model.json",
-        "22.2018.lover/22.2017.tomo-bukatsu.low.model.json",
-        "22.2018.lover/22.2017.valley.model.json",
-        "22.2018.lover/22.2017.vdays.model.json",
-        "22.2018.lover/22.2018.lover.model.json",
-        "22.2018.lover/22.2018.spring.model.json",
-        "22.2018.lover/22.xmas.1.model.json",
-        "22.2018.lover/22.xmas.2.model.json"
-      ]
-    },
-    {
-      "name": "33.2018.lover",
-      "path": "33.2018.lover/model.default.json",
-      "message": "33号舰娘",
-      "costumes": [
-        "33.2018.lover/33.2018.lover.model.json",
-        "33.2018.lover/model.2016.xmas.1.json",
-        "33.2018.lover/model.2016.xmas.2.json",
-        "33.2018.lover/model.2017.cba-normal.json",
-        "33.2018.lover/model.2017.newyear.json",
-        "33.2018.lover/model.2017.school.json",
-        "33.2018.lover/model.2017.summer.normal.1.json",
-        "33.2018.lover/model.2017.summer.normal.2.json",
-        "33.2018.lover/model.2017.tomo-bukatsu.high.json",
-        "33.2018.lover/model.2017.tomo-bukatsu.low.json",
-        "33.2018.lover/model.2017.valley.json",
-        "33.2018.lover/model.2017.vdays.json",
-        "33.2018.lover/model.2018.spring.json"
-      ]
-    },
-    {
       "name": "95type_405",
       "path": "95type_405/95type_405.model.json",
       "message": "95TYPE (少女前线)"
@@ -69,16 +29,6 @@
       "name": "aoba",
       "path": "aoba/model.json",
       "message": "青叶"
-    },
-    {
-      "name": "bilibili-22",
-      "path": "bilibili-22/index.json",
-      "message": "Bilibili 22号"
-    },
-    {
-      "name": "bilibili-33",
-      "path": "bilibili-33/index.json",
-      "message": "Bilibili 33号"
     },
     {
       "name": "Bronya",
@@ -179,11 +129,6 @@
       "message": "gelina"
     },
     {
-      "name": "gf",
-      "path": "gf/Gantzert_Felixander.model.json",
-      "message": "gf"
-    },
-    {
       "name": "grizzly_2102",
       "path": "grizzly_2102/grizzly_2102.model.json",
       "message": "GRIZZLY (少女前线)"
@@ -195,21 +140,6 @@
       "costumes": [
         "hallo_16/physics_hallo.json"
       ]
-    },
-    {
-      "name": "haru01",
-      "path": "haru01/haru01.model.json",
-      "message": "haru01"
-    },
-    {
-      "name": "haru02",
-      "path": "haru02/haru02.model.json",
-      "message": "haru02"
-    },
-    {
-      "name": "haruto",
-      "path": "haruto/haruto.model.json",
-      "message": "haruto"
     },
     {
       "name": "hibiki",
@@ -247,16 +177,6 @@
       "message": "index"
     },
     {
-      "name": "izumi",
-      "path": "izumi/izumi.model.json",
-      "message": "izumi"
-    },
-    {
-      "name": "jin",
-      "path": "jin/jin.model.json",
-      "message": "jin"
-    },
-    {
       "name": "k2_3301",
       "path": "k2_3301/k2_3301.model.json",
       "message": "K2 (少女前线)"
@@ -275,24 +195,6 @@
       "name": "kesshouban",
       "path": "kesshouban/model.json",
       "message": "血小板"
-    },
-    {
-      "name": "kesyoban",
-      "path": "kesyoban/kesyoban.model.json",
-      "message": "kesyoban",
-      "costumes": [
-        "kesyoban/model.json"
-      ]
-    },
-    {
-      "name": "Kobayaxi",
-      "path": "Kobayaxi/Kobayaxi.model.json",
-      "message": "Kobayaxi"
-    },
-    {
-      "name": "koharu",
-      "path": "koharu/koharu.model.json",
-      "message": "koharu"
     },
     {
       "name": "kp31_1103",
@@ -318,37 +220,6 @@
       "name": "kurumi",
       "path": "kurumi/model.json",
       "message": "狂三"
-    },
-    {
-      "name": "len",
-      "path": "len/len.model.json",
-      "message": "len"
-    },
-    {
-      "name": "len_impact",
-      "path": "len_impact/len_impact.model.json",
-      "message": "LEN (少女前线)",
-      "costumes": [
-        "len_impact/physics_space.json",
-        "len_impact/pose_impact.json"
-      ]
-    },
-    {
-      "name": "len_space",
-      "path": "len_space/len_space.model.json",
-      "message": "LEN (少女前线)",
-      "costumes": [
-        "len_space/physics_space.json",
-        "len_space/pose_space.json"
-      ]
-    },
-    {
-      "name": "len_swim",
-      "path": "len_swim/len_swim.model.json",
-      "message": "LEN (少女前线)",
-      "costumes": [
-        "len_swim/physics_swim.json"
-      ]
     },
     {
       "name": "lewis_3502",
@@ -394,49 +265,9 @@
       "message": "MLEMK1 (少女前线)"
     },
     {
-      "name": "murakumo",
-      "path": "murakumo/index.json",
-      "message": "murakumo"
-    },
-    {
-      "name": "nep",
-      "path": "nep/model.json",
-      "message": "Nep"
-    },
-    {
-      "name": "nepmaid",
-      "path": "nepmaid/nepmaid.model.json",
-      "message": "海王星女仆"
-    },
-    {
       "name": "neptune",
       "path": "neptune/model.json",
       "message": "海王星"
-    },
-    {
-      "name": "ni-j",
-      "path": "ni-j/ni-j.model.json",
-      "message": "ni-j"
-    },
-    {
-      "name": "nico",
-      "path": "nico/nico.model.json",
-      "message": "nico"
-    },
-    {
-      "name": "nietzsche",
-      "path": "nietzsche/nietzsche.model.json",
-      "message": "nietzsche"
-    },
-    {
-      "name": "nipsilon",
-      "path": "nipsilon/nipsilon.model.json",
-      "message": "nipsilon"
-    },
-    {
-      "name": "nito",
-      "path": "nito/nito.model.json",
-      "message": "nito"
     },
     {
       "name": "ntw20_2301",
@@ -454,11 +285,6 @@
       "message": "OTS14 (少女前线)"
     },
     {
-      "name": "penchan",
-      "path": "penchan/penchan.model.json",
-      "message": "penchan"
-    },
-    {
       "name": "Pio",
       "path": "Pio/index.json",
       "message": "Pio"
@@ -472,16 +298,6 @@
       "name": "platelet",
       "path": "platelet/model.json",
       "message": "血小板"
-    },
-    {
-      "name": "PLT",
-      "path": "PLT/PLT.model.json",
-      "message": "PLT"
-    },
-    {
-      "name": "poi",
-      "path": "poi/poi.model.json",
-      "message": "poi"
     },
     {
       "name": "potion-Maker-Pio",
@@ -524,89 +340,14 @@
       "message": "纱雾"
     },
     {
-      "name": "sat8_2601",
-      "path": "sat8_2601/sat8_2601.model.json",
-      "message": "SAT8 (少女前线)"
-    },
-    {
-      "name": "sat8_3602",
-      "path": "sat8_3602/sat8_3602.model.json",
-      "message": "SAT8 (少女前线)"
-    },
-    {
-      "name": "saten",
-      "path": "saten/saten.model.json",
-      "message": "saten"
-    },
-    {
-      "name": "seifuku",
-      "path": "seifuku/seifuku.model.json",
-      "message": "seifuku"
-    },
-    {
-      "name": "shifuku",
-      "path": "shifuku/shifuku.model.json",
-      "message": "shifuku"
-    },
-    {
-      "name": "shifuku2",
-      "path": "shifuku2/shifuku2.model.json",
-      "message": "shifuku2"
-    },
-    {
-      "name": "shizuku",
-      "path": "shizuku/shizuku.model.json",
-      "message": "雫"
-    },
-    {
-      "name": "shizuku-48",
-      "path": "shizuku-48/index.json",
-      "message": "雫 (48)"
-    },
-    {
-      "name": "shizuku-pajama",
-      "path": "shizuku-pajama/index.json",
-      "message": "雫 (睡衣)"
-    },
-    {
       "name": "snow_miku",
       "path": "snow_miku/model.json",
       "message": "雪初音"
     },
     {
-      "name": "stl",
-      "path": "stl/stl.model.json",
-      "message": "stl"
-    },
-    {
-      "name": "tia",
-      "path": "tia/tia.model.json",
-      "message": "tia"
-    },
-    {
       "name": "tororo",
       "path": "tororo/tororo.model.json",
       "message": "tororo"
-    },
-    {
-      "name": "touma",
-      "path": "touma/touma.model.json",
-      "message": "touma"
-    },
-    {
-      "name": "tsumiki",
-      "path": "tsumiki/tsumiki.model.json",
-      "message": "tsumiki"
-    },
-    {
-      "name": "type64-ar_2901",
-      "path": "type64-ar_2901/type64-ar_2901.model.json",
-      "message": "TYPE64-AR (少女前线)"
-    },
-    {
-      "name": "type88_3504",
-      "path": "type88_3504/type88_3504.model.json",
-      "message": "TYPE88 (少女前线)"
     },
     {
       "name": "uiharu",
@@ -647,14 +388,6 @@
       "name": "wanko",
       "path": "wanko/wanko.model.json",
       "message": "wanko"
-    },
-    {
-      "name": "wed_16",
-      "path": "wed_16/physics_wed.json",
-      "message": "WED (少女前线)",
-      "costumes": [
-        "wed_16/wed_16.model.json"
-      ]
     },
     {
       "name": "welrod_1401",
