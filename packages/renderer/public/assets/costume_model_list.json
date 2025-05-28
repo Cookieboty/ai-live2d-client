@@ -41,21 +41,6 @@
       "message": "CBJMS (少女前线)"
     },
     {
-      "name": "chino",
-      "path": "chino/model.json",
-      "message": "智乃"
-    },
-    {
-      "name": "chitose",
-      "path": "chitose/chitose.model.json",
-      "message": "千岁"
-    },
-    {
-      "name": "contender_2302",
-      "path": "contender_2302/contender_2302.model.json",
-      "message": "CONTENDER (少女前线)"
-    },
-    {
       "name": "date_16",
       "path": "date_16/date_16.model.json",
       "message": "DATE (少女前线)"
@@ -69,16 +54,6 @@
       "name": "dsr50_2101",
       "path": "dsr50_2101/dsr50_2101.model.json",
       "message": "DSR50 (少女前线)"
-    },
-    {
-      "name": "Epsilon",
-      "path": "Epsilon/Epsilon.model.json",
-      "message": "Epsilon"
-    },
-    {
-      "name": "Epsilon2.1",
-      "path": "Epsilon2.1/Epsilon2.1.model.json",
-      "message": "Epsilon2"
     },
     {
       "name": "fn57_2203",
