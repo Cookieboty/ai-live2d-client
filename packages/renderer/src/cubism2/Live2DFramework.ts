@@ -204,7 +204,16 @@ export class L2DBaseModel {
         this.live2DModel.getCanvasWidth(),
         this.live2DModel.getCanvasHeight(),
       );
-      this.modelMatrix.setWidth(2);
+
+      // 根据Live2D官方文档和社区最佳实践进行模型自适应
+      // 参考：https://community.live2d.com/discussion/357/question-canvas-size-and-scaling
+      const modelCanvasWidth = this.live2DModel.getCanvasWidth();
+
+      const scaleX = 1.5 / modelCanvasWidth;
+      const scaleY = -scaleX; // 保持宽高比，Y轴翻转
+
+      // 应用自适应缩放，确保模型完整显示
+      this.modelMatrix.scale(scaleX, scaleY);
       this.modelMatrix.setCenterPosition(0, 0);
 
       callback(this.live2DModel);

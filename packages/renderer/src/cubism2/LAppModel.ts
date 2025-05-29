@@ -89,11 +89,18 @@ class LAppModel extends L2DBaseModel {
 
             if (this.modelSetting!.getLayout() != null) {
               const layout = this.modelSetting!.getLayout();
-              if (layout['width'] != null && this.modelMatrix)
-                this.modelMatrix.setWidth(layout['width']);
-              if (layout['height'] != null && this.modelMatrix)
-                this.modelMatrix.setHeight(layout['height']);
 
+              // 按照官方文档标准方法处理layout
+              // 参考：https://docs.live2d.com/en/cubism-sdk-manual/layout/
+
+              if (layout['width'] != null && this.modelMatrix) {
+                this.modelMatrix.setWidth(layout['width']);
+              }
+              if (layout['height'] != null && this.modelMatrix) {
+                this.modelMatrix.setHeight(layout['height']);
+              }
+
+              // 位置设置
               if (layout['x'] != null && this.modelMatrix) this.modelMatrix.setX(layout['x']);
               if (layout['y'] != null && this.modelMatrix) this.modelMatrix.setY(layout['y']);
               if (layout['center_x'] != null && this.modelMatrix)
