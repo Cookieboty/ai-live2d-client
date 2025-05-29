@@ -26,11 +26,6 @@
       "message": "AN94 (少女前线)"
     },
     {
-      "name": "aoba",
-      "path": "aoba/model.json",
-      "message": "青叶"
-    },
-    {
       "name": "Bronya",
       "path": "Bronya/Bronya.model.json",
       "message": "布洛妮娅"
@@ -66,11 +61,6 @@
       "message": "G36 (少女前线)"
     },
     {
-      "name": "g36c_1202",
-      "path": "g36c_1202/g36c_1202.model.json",
-      "message": "G36C (少女前线)"
-    },
-    {
       "name": "g41_2401",
       "path": "g41_2401/g41_2401.model.json",
       "message": "G41 (少女前线)"
@@ -84,11 +74,6 @@
       "name": "hallo_16",
       "path": "hallo_16/hallo_16.model.json",
       "message": "HALLO (少女前线)"
-    },
-    {
-      "name": "hibiki",
-      "path": "hibiki/hibiki.model.json",
-      "message": "hibiki"
     },
     {
       "name": "hijiki",
@@ -126,11 +111,6 @@
       "message": "K2 (少女前线)"
     },
     {
-      "name": "kanna",
-      "path": "kanna/model.json",
-      "message": "康娜"
-    },
-    {
       "name": "kanzaki",
       "path": "kanzaki/kanzaki.model.json",
       "message": "kanzaki"
@@ -143,11 +123,6 @@
     {
       "name": "kp31_1103",
       "path": "kp31_1103/kp31_1103.model.json",
-      "message": "KP31 (少女前线)"
-    },
-    {
-      "name": "kp31_310",
-      "path": "kp31_310/kp31_310.model.json",
       "message": "KP31 (少女前线)"
     },
     {
@@ -164,11 +139,6 @@
       "name": "kurumi",
       "path": "kurumi/model.json",
       "message": "狂三"
-    },
-    {
-      "name": "lewis_3502",
-      "path": "lewis_3502/lewis_3502.model.json",
-      "message": "LEWIS (少女前线)"
     },
     {
       "name": "m1928a1_1501",
@@ -196,11 +166,6 @@
       "message": "初音未来"
     },
     {
-      "name": "mlemk1_604",
-      "path": "mlemk1_604/mlemk1_604.model.json",
-      "message": "MLEMK1 (少女前线)"
-    },
-    {
       "name": "neptune",
       "path": "neptune/model.json",
       "message": "海王星"
@@ -209,11 +174,6 @@
       "name": "ntw20_2301",
       "path": "ntw20_2301/ntw20_2301.model.json",
       "message": "NTW20 (少女前线)"
-    },
-    {
-      "name": "ots14_1203",
-      "path": "ots14_1203/ots14_1203.model.json",
-      "message": "OTS14 (少女前线)"
     },
     {
       "name": "ots14_3001",
@@ -256,11 +216,6 @@
       "message": "R93 (少女前线)"
     },
     {
-      "name": "rem",
-      "path": "rem/model.json",
-      "message": "蕾姆"
-    },
-    {
       "name": "rfb_1601",
       "path": "rfb_1601/rfb_1601.model.json",
       "message": "RFB (少女前线)"
@@ -269,11 +224,6 @@
       "name": "ryoufuku",
       "path": "ryoufuku/ryoufuku.model.json",
       "message": "ryoufuku"
-    },
-    {
-      "name": "sagiri",
-      "path": "sagiri/model.json",
-      "message": "纱雾"
     },
     {
       "name": "snow_miku",
@@ -286,19 +236,9 @@
       "message": "tororo"
     },
     {
-      "name": "uiharu",
-      "path": "uiharu/uiharu.model.json",
-      "message": "uiharu"
-    },
-    {
       "name": "umaru",
       "path": "umaru/model.json",
       "message": "小埋"
-    },
-    {
-      "name": "ump45_3403",
-      "path": "ump45_3403/ump45_3403.model.json",
-      "message": "UMP45 (少女前线)"
     },
     {
       "name": "ump9_3404",
@@ -344,11 +284,6 @@
       "name": "YuzukiYukari",
       "path": "YuzukiYukari/YuzukiYukari.model.json",
       "message": "YuzukiYukari"
-    },
-    {
-      "name": "z16",
-      "path": "z16/z16.model.json",
-      "message": "Z16 驱逐舰"
     }
   ]
 }
