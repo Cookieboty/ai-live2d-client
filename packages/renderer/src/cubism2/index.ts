@@ -115,10 +115,10 @@ class Cubism2Model {
   }
 
   /**
-   * @deprecated 已废弃，使用setupCanvasSize代替
+   * @deprecated 已废弃，原始项目不需要此方法
    */
   setupModelMatrix(): void {
-    // 此方法已废弃，功能已移至setupCanvasSize方法
+    // 此方法已废弃，原始项目不需要此功能
   }
 
   destroy(): void {
