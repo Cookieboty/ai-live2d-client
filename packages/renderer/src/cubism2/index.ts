@@ -57,8 +57,7 @@ class Cubism2Model {
 
     this.dragMgr = new L2DTargetPoint();
 
-    // 根据Live2D官方文档的最佳实践设置视图矩阵
-    // 使用标准的正交投影设置
+    // 根据原始项目的视口设置 - 完全按照live2d-widget项目的逻辑
     const ratio = height / width;
     const left = LAppDefine.VIEW_LOGICAL_LEFT;
     const right = LAppDefine.VIEW_LOGICAL_RIGHT;
@@ -76,34 +75,26 @@ class Cubism2Model {
     this.viewMatrix.setMaxScale(LAppDefine.VIEW_MAX_SCALE);
     this.viewMatrix.setMinScale(LAppDefine.VIEW_MIN_SCALE);
 
-    // 设置投影矩阵 - 使用官方推荐的方式
+    // 投影矩阵设置 - 按照原始项目的方式
     this.projMatrix = new L2DMatrix44();
     this.projMatrix.multScale(1, width / height);
 
-    // 设备到屏幕的变换矩阵
+    // 设备到屏幕的变换矩阵 - 按照原始项目的方式
     this.deviceToScreen = new L2DMatrix44();
     this.deviceToScreen.multTranslate(-width / 2.0, -height / 2.0);
     this.deviceToScreen.multScale(2 / width, -2 / width);
 
-    // 初始化WebGL上下文 - 按照Live2D官方要求配置
+    // WebGL上下文初始化 - 按照原始项目的配置
     this.gl = this.canvas.getContext('webgl2', {
-      alpha: true,                    // 启用alpha通道
-      premultipliedAlpha: true,       // Live2D要求启用预乘alpha
-      preserveDrawingBuffer: false,   // 禁用缓冲区保留，避免残留
-      antialias: true,               // 启用抗锯齿
-      depth: true,                   // 启用深度缓冲
-      stencil: false                 // 禁用模板缓冲
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: true
     }) as WebGLRenderingContext;
 
     if (!this.gl) {
       // 尝试fallback到webgl1
       this.gl = this.canvas.getContext('webgl', {
-        alpha: true,
-        premultipliedAlpha: true,      // Live2D要求启用预乘alpha
-        preserveDrawingBuffer: false,
-        antialias: true,
-        depth: true,
-        stencil: false
+        premultipliedAlpha: true,
+        preserveDrawingBuffer: true
       }) as WebGLRenderingContext;
     }
 
@@ -114,18 +105,11 @@ class Cubism2Model {
 
     (Live2D as any).setGL(this.gl);
 
-    // 设置透明背景并启用适合预乘alpha的混合模式
+    // 设置透明背景 - 按照原始项目的方式
     this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
-    this.gl.enable(this.gl.BLEND);
-    // 使用适合预乘alpha的混合函数
-    this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
     // 加载模型
     await this.changeModelWithJSON(modelSettingPath, modelSetting);
-
-    // 模型加载完成后，设置Canvas尺寸（包含模型矩阵设置）
-    this.setupCanvasSize(width, height);
 
     this.startDraw();
   }
@@ -191,6 +175,7 @@ class Cubism2Model {
 
   draw(): void {
     if (!this.gl) return;
+
     MatrixStack.reset();
     MatrixStack.loadIdentity();
 
@@ -199,27 +184,11 @@ class Cubism2Model {
       this.live2DMgr.setDrag(this.dragMgr.getX(), this.dragMgr.getY());
     }
 
-    // 强制设置Canvas元素背景为透明
-    if (this.canvas) {
-      this.canvas.style.background = 'transparent';
-      this.canvas.style.backgroundColor = 'transparent';
-    }
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    // 确保每次绘制都有透明背景
-    this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
-
-    // 强制设置适合预乘alpha的混合模式
-    this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
-
-    // 转换Float32Array为number[]类型
     if (this.projMatrix && this.viewMatrix) {
-      const projArray = this.projMatrix.getArray();
-      const viewArray = this.viewMatrix.getArray();
-
-      MatrixStack.multMatrix(projArray);
-      MatrixStack.multMatrix(viewArray);
+      MatrixStack.multMatrix(this.projMatrix.getArray());
+      MatrixStack.multMatrix(this.viewMatrix.getArray());
     }
 
     MatrixStack.push();
@@ -227,9 +196,6 @@ class Cubism2Model {
     const model = this.live2DMgr.getModel();
 
     if (model == null) {
-      // 即使没有模型也要清除背景
-      this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
-      this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
       MatrixStack.pop();
       return;
     }
@@ -240,10 +206,6 @@ class Cubism2Model {
     }
 
     MatrixStack.pop();
-
-    // 关键修复：在绘制完成后强制清除背景色，防止残留
-    // 这是根据Live2D社区论坛的解决方案
-    this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
   }
 
   async changeModel(modelSettingPath: string): Promise<void> {
@@ -254,19 +216,7 @@ class Cubism2Model {
 
   async changeModelWithJSON(modelSettingPath: string, modelSetting: any): Promise<void> {
     if (this.gl) {
-      // 重置WebGL背景色，确保新模型有透明背景
-      this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
-      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
       await this.live2DMgr.changeModelWithJSON(this.gl, modelSettingPath, modelSetting);
-
-      // 模型加载完成后，重新设置Canvas尺寸以适应新模型
-      // 这里需要延迟执行，确保模型完全初始化
-      setTimeout(() => {
-        if (this.canvas) {
-          this.setupCanvasSize(this.canvas.width, this.canvas.height);
-        }
-      }, 100);
     }
   }
 
@@ -442,44 +392,6 @@ class Cubism2Model {
   transformScreenY(deviceY: number): number {
     if (!this.deviceToScreen) return 0;
     return this.deviceToScreen.transformY(deviceY);
-  }
-
-  /**
-   * 设置Canvas尺寸 - 使用Live2D官方默认逻辑
-   */
-  setupCanvasSize(canvasWidth: number, canvasHeight: number): void {
-    if (!this.canvas || !this.gl) return;
-
-    // 设置Canvas的实际尺寸
-    this.canvas.width = canvasWidth;
-    this.canvas.height = canvasHeight;
-
-    // 设置WebGL视口
-    this.gl.viewport(0, 0, canvasWidth, canvasHeight);
-
-    // 重新计算投影矩阵
-    if (this.projMatrix) {
-      this.projMatrix.identity();
-      this.projMatrix.multScale(1, canvasWidth / canvasHeight);
-    }
-
-    // 重新计算设备到屏幕的变换矩阵
-    if (this.deviceToScreen) {
-      this.deviceToScreen.identity();
-      this.deviceToScreen.multTranslate(-canvasWidth / 2.0, -canvasHeight / 2.0);
-      this.deviceToScreen.multScale(2 / canvasWidth, -2 / canvasWidth);
-    }
-
-    // 重新计算视图矩阵的屏幕范围
-    if (this.viewMatrix) {
-      const ratio = canvasHeight / canvasWidth;
-      const left = LAppDefine.VIEW_LOGICAL_LEFT;
-      const right = LAppDefine.VIEW_LOGICAL_RIGHT;
-      const bottom = -ratio;
-      const top = ratio;
-
-      this.viewMatrix.setScreenRect(left, right, bottom, top);
-    }
   }
 }
 
