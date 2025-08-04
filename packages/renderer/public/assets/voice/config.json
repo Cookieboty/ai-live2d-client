@@ -31,7 +31,7 @@
   },
   "settings": {
     "enableVoiceNotification": true,
-    "voiceMode": "mixed",
+    "voiceMode": "fixed",
     "preferredCategory": "normal",
     "selectionMode": "random",
     "fallbackToTTS": true,
