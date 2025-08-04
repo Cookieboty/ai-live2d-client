@@ -39,11 +39,64 @@
     "summaryMaxLength": 30
   },
   "tts": {
-    "voice": "Ting-Ting",
-    "speed": 1.0,
-    "pitch": 1.0,
-    "volume": 0.8,
-    "language": "zh-CN"
+    "currentVoice": "ting_ting",
+    "voices": {
+      "ting_ting": {
+        "name": "婷婷",
+        "systemVoice": "Ting-Ting",
+        "platform": "darwin",
+        "language": "zh-CN",
+        "gender": "female",
+        "style": "gentle"
+      },
+      "mei_mei": {
+        "name": "美美",
+        "systemVoice": "Mei-Jia",
+        "platform": "darwin", 
+        "language": "zh-CN",
+        "gender": "female",
+        "style": "cheerful"
+      },
+      "xiao_yu": {
+        "name": "小雨",
+        "systemVoice": "Yu-shu",
+        "platform": "darwin",
+        "language": "zh-CN", 
+        "gender": "female",
+        "style": "calm"
+      },
+      "windows_yaoyao": {
+        "name": "瑶瑶",
+        "systemVoice": "Microsoft Yaoyao Desktop",
+        "platform": "win32",
+        "language": "zh-CN",
+        "gender": "female",
+        "style": "standard"
+      },
+      "windows_kangkang": {
+        "name": "康康",
+        "systemVoice": "Microsoft Kangkang Desktop", 
+        "platform": "win32",
+        "language": "zh-CN",
+        "gender": "male",
+        "style": "friendly"
+      },
+      "linux_mandarin": {
+        "name": "普通话",
+        "systemVoice": "zh",
+        "platform": "linux",
+        "language": "zh-CN",
+        "gender": "neutral", 
+        "style": "standard"
+      }
+    },
+    "settings": {
+      "speed": 1.0,
+      "pitch": 1.0,
+      "volume": 0.8,
+      "autoSelectByPlatform": true,
+      "fallbackToDefault": true
+    }
   },
   "projectAnalysis": {
     "enabled": true,
