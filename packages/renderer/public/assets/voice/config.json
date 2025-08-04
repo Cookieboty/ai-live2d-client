@@ -1,0 +1,55 @@
+{
+  "voices": {
+    "completion_01": {
+      "name": "标准完成",
+      "file": "completion/normal/completion_01.mp3",
+      "category": "normal",
+      "tags": ["standard", "completion"],
+      "weight": 1.0
+    },
+    "completion_02": {
+      "name": "标准完成2",
+      "file": "completion/normal/completion_02.mp3", 
+      "category": "normal",
+      "tags": ["standard", "completion"],
+      "weight": 1.0
+    },
+    "great_job_01": {
+      "name": "太棒了",
+      "file": "completion/excited/great_job_01.mp3",
+      "category": "high",
+      "tags": ["excited", "completion"],
+      "weight": 1.2
+    },
+    "done_01": {
+      "name": "完成",
+      "file": "completion/calm/done_01.mp3",
+      "category": "low",
+      "tags": ["calm", "completion"],
+      "weight": 0.8
+    }
+  },
+  "settings": {
+    "enableVoiceNotification": true,
+    "voiceMode": "mixed",
+    "preferredCategory": "normal",
+    "selectionMode": "random",
+    "fallbackToTTS": true,
+    "enableProjectSummary": true,
+    "summaryMaxLength": 30
+  },
+  "tts": {
+    "voice": "Ting-Ting",
+    "speed": 1.0,
+    "pitch": 1.0,
+    "volume": 0.8,
+    "language": "zh-CN"
+  },
+  "projectAnalysis": {
+    "enabled": true,
+    "includeFileCount": true,
+    "includeTaskInfo": true,
+    "timespan": "1h",
+    "summaryTemplate": "项目更新：最近修改了 {filesModified} 个文件，主要改动：{mainChanges}"
+  }
+}
