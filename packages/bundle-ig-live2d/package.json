@@ -1,0 +1,61 @@
+{
+  "name": "@ig-live/bundle-ig-live2d",
+  "version": "0.0.1",
+  "private": true,
+  "description": "dsh Bundle：看板娘渲染进程能力（Live2d seam / 触摸感官注入 / TTS 嘴型联动 / waifu 专属工具 + agent preset）",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./patch": "./dist/patch.yml",
+    "./seams": {
+      "types": "./dist/seams/index.d.ts",
+      "import": "./dist/seams/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": "./dist/patch.yml"
+  },
+  "scripts": {
+    "build": "tsup && node scripts/copy-patch.mjs",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "clean": "rimraf dist coverage .turbo"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh": "0.1.2-alpha.3",
+    "@ig-live/bundle-ig-base": "workspace:*",
+    "@ig-live/bundle-ig-electron-caps": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh": {
+      "optional": true
+    },
+    "@ig-live/bundle-ig-electron-caps": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "yaml": "^2.6.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@ig-live/bundle-ig-base": "workspace:*",
+    "@ig-live/bundle-ig-electron-caps": "workspace:*",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

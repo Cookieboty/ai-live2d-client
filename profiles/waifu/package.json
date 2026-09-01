@@ -1,0 +1,17 @@
+{
+  "name": "dsh-profile-waifu",
+  "private": true,
+  "version": "0.0.0",
+  "description": "看板娘一体化 profile：桌宠 + 语音互动 + AI 对话（Electron 主进程/渲染进程双端）",
+  "dependencies": {
+    "@deepseek-ai/dsh-base": "0.1.2-alpha.3"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base"
+      ],
+      "patchReload": "live"
+    }
+  }
+}

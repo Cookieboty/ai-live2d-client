@@ -1,0 +1,17 @@
+{
+  "name": "dsh-profile-chat-only",
+  "private": true,
+  "version": "0.0.0",
+  "description": "纯文字聊天 profile：只启用 ai-chat 前端所需的最小 dsh-base 能力",
+  "dependencies": {
+    "@deepseek-ai/dsh-base": "0.1.2-alpha.3"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base"
+      ],
+      "patchReload": "live"
+    }
+  }
+}
