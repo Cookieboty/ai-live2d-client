@@ -1,8 +1,10 @@
 /* global document, window, Live2D */
-import { L2DMatrix44, L2DTargetPoint, L2DViewMatrix, L2DModelMatrix } from './Live2DFramework';
 import LAppDefine from './LAppDefine';
-import MatrixStack from './utils/MatrixStack';
 import LAppLive2DManager from './LAppLive2DManager';
+import type LAppModel from './LAppModel';
+import { L2DMatrix44, L2DTargetPoint, L2DViewMatrix, L2DModelMatrix } from './Live2DFramework';
+import MatrixStack from './utils/MatrixStack';
+
 import logger from '@/utils/logger';
 
 class Cubism2Model {
@@ -217,6 +219,14 @@ class Cubism2Model {
   async changeModelWithJSON(modelSettingPath: string, modelSetting: any): Promise<void> {
     if (this.gl) {
       await this.live2DMgr.changeModelWithJSON(this.gl, modelSettingPath, modelSetting);
+    }
+  }
+
+  setLipSyncValue(value: number): void {
+    const model = this.live2DMgr.getModel() as (LAppModel & { setLipSyncValue?: (v: number) => void }) | null;
+    if (model && typeof model.setLipSyncValue === 'function') {
+      const clamped = value < 0 ? 0 : value > 1 ? 1 : value;
+      model.setLipSyncValue(clamped);
     }
   }
 
