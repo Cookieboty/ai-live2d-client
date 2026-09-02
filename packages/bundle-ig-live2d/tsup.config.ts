@@ -1,7 +1,39 @@
-import { createTsup } from '../../tsup.base';
+import { defineConfig } from 'tsup';
 
-export default createTsup({
-  preset: 'react-lib',
-  entry: ['src/index.ts', 'src/seams/index.ts'],
-  external: ['@deepseek-ai/dsh', '@ig-live/bundle-ig-base', '@ig-live/bundle-ig-electron-caps'],
-});
+/**
+ * bundle-ig-live2d 主入口是 React/渲染进程代码（ESM only），
+ * 但 `./seams` 只导出 Service Key / 类型 / 契约，是纯 Node/浏览器双兼容代码，
+ * 且被 `@ig-live/ai-sdk` 的 CJS build 作为**运行时值**引用（Live2dKey 需要注入）。
+ *
+ * 因此拆两条 tsup 流水线：
+ * 1) 主入口 `src/index.ts` → 浏览器 ESM
+ * 2) `src/seams/index.ts`  → node，ESM + CJS 双格式
+ */
+const externals = ['@deepseek-ai/dsh', '@ig-live/bundle-ig-base', '@ig-live/bundle-ig-electron-caps'];
+
+export default defineConfig([
+  {
+    entry: ['src/index.ts'],
+    format: ['esm'],
+    platform: 'browser',
+    dts: true,
+    splitting: false,
+    clean: true,
+    sourcemap: true,
+    target: 'es2022',
+    treeshake: true,
+    external: [...externals, 'react', 'react-dom'],
+  },
+  {
+    entry: { 'seams/index': 'src/seams/index.ts' },
+    format: ['esm', 'cjs'],
+    platform: 'node',
+    dts: true,
+    splitting: false,
+    clean: false,
+    sourcemap: true,
+    target: 'es2022',
+    treeshake: true,
+    external: externals,
+  },
+]);
